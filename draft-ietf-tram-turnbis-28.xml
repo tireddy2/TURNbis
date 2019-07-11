@@ -153,7 +153,7 @@
       to avoid forcing the media sessions through TCP, Enterprise Firewall can
       be configured to allow UDP traffic relayed through an Enterprise relay
       server. This scenario is required to be supported by the WebRTC
-      requirements (Section 2.3.5.1 in <xref target="RFC7478"></xref>). </t>
+      requirements (Section 2.3.5.1 in <xref target="RFC7478"></xref>).</t>
 
       <t>This specification defines a protocol, called TURN, that allows a
       host behind a NAT (called the TURN client) to request that another host
@@ -864,7 +864,10 @@ client                               server          A             B
         standard part of TCP, but applications using UDP (and thus any
         application using this version of TURN) need to avoid IP fragmentation
         by sending sufficiently small messages or use UDP fragmentation <xref
-        target="I-D.ietf-tsvwg-udp-options"></xref>.</t>
+        target="I-D.ietf-tsvwg-udp-options"></xref>. <xref
+        target="I-D.ietf-intarea-frag-fragile"></xref> discusses issues
+        associated with IP fragmentation and proposes alternatives to IP
+        fragmentation. </t>
 
         <t>The application running on the client and the peer can take one of
         two approaches to avoid IP fragmentation until UDP fragmentation
@@ -1042,7 +1045,7 @@ client                               server          A             B
 
       <t><xref target="I-D.ietf-tram-stunbis"></xref> specifies an
       authentication mechanism called the long-term credential mechanism. TURN
-      servers and clients MUST implement this mechanism. The server MUST
+      servers and clients MUST implement this mechanism. The server SHOULD
       demand that all requests from the client be authenticated using this
       mechanism, or that a equally strong or stronger mechanism for client
       authentication is used.</t>
@@ -1128,13 +1131,14 @@ client                               server          A             B
       treat the request as idempotent (see <xref
       target="I-D.ietf-tram-stunbis"></xref>). Some implementations may choose
       to meet this requirement by remembering all received requests and the
-      corresponding responses for 40 seconds. Other implementations may choose
-      to reprocess the request and arrange that such reprocessing returns
-      essentially the same response. To aid implementors who choose the latter
-      approach (the so-called "stateless stack approach"), this specification
-      includes some implementation notes on how this might be done.
-      Implementations are free to choose either approach or choose some other
-      approach that gives the same results.</t>
+      corresponding responses for 40 seconds (Section 6.3.1 in <xref
+      target="I-D.ietf-tram-stunbis"></xref>). Other implementations may
+      choose to reprocess the request and arrange that such reprocessing
+      returns essentially the same response. To aid implementors who choose
+      the latter approach (the so-called "stateless stack approach"), this
+      specification includes some implementation notes on how this might be
+      done. Implementations are free to choose either approach or choose some
+      other approach that gives the same results.</t>
 
       <t>To mitigate either intentional or unintentional denial-of-service
       attacks against the server by clients with valid usernames and
@@ -1347,16 +1351,17 @@ client                               server          A             B
             Request) error.</t>
 
             <t>If the server does not support the address family requested by
-            the client in REQUESTED-ADDRESS-FAMILY or is disabled by local
-            policy, it MUST generate an Allocate error response, and it MUST
-            include an ERROR-CODE attribute with the 440 (Address Family not
-            Supported) response code. If the REQUESTED-ADDRESS-FAMILY
-            attribute is absent and the server does not support IPv4 address
-            family, the server MUST include an ERROR-CODE attribute with the
-            440 (Address Family not Supported) response code. If the
-            REQUESTED-ADDRESS-FAMILY attribute is absent and the server
-            supports IPv4 address family, the server MUST allocate an IPv4
-            relayed transport address for the TURN client.</t>
+            the client in REQUESTED-ADDRESS-FAMILY or if the allocation of the
+            requested address family is disabled by local policy, it MUST
+            generate an Allocate error response, and it MUST include an
+            ERROR-CODE attribute with the 440 (Address Family not Supported)
+            response code. If the REQUESTED-ADDRESS-FAMILY attribute is absent
+            and the server does not support IPv4 address family, the server
+            MUST include an ERROR-CODE attribute with the 440 (Address Family
+            not Supported) response code. If the REQUESTED-ADDRESS-FAMILY
+            attribute is absent and the server supports IPv4 address family,
+            the server MUST allocate an IPv4 relayed transport address for the
+            TURN client.</t>
 
             <t>The server checks if the request contains an EVEN-PORT
             attribute with the R bit set to 1. If yes, and the request also
@@ -1704,7 +1709,7 @@ client                               server          A             B
         REQUESTED-ADDRESS-FAMILY attribute indicating the address family type
         that should be refreshed. If no REQUESTED-ADDRESS-FAMILY is included
         then the request should be treated as applying to all current
-        allocations. The client MUST only include family types it previously
+        allocations. The client MUST only include family type it previously
         allocated and has not yet deleted. This process can also be used to
         delete an allocation of a specific address type, by setting the
         lifetime of that refresh request to 0. Deleting a single allocation
@@ -2049,7 +2054,7 @@ client                               server          A             B
         packet in the ICMP packet payload contains a UDP header, and if a UDP
         header is present, the server extracts the UDP source and destination
         port information. If either of these conditions fail, then the ICMP
-        packet is silently dropped. </t>
+        packet is silently dropped.</t>
 
         <t>The server looks up the allocation whose relayed transport address
         corresponds to the encapsulated packet's source IP address and UDP
@@ -2419,9 +2424,7 @@ client                               server          A             B
 
         <t>When the server receives an ICMP packet, the server processes it as
         described in <xref target="sec-sending-senderror-indication"></xref>.
-        A Data indication MUST be sent regardless of whether there is a
-        channel bound to the peer that was the destination of the UDP datagram
-        that triggered the reception of the ICMP packet.</t>
+        </t>
       </section>
     </section>
 
@@ -2439,11 +2442,12 @@ client                               server          A             B
 
       <t>The descriptions below have two parts: a preferred behavior and an
       alternate behavior. The server SHOULD implement the preferred behavior.
-      Otherwise, the server MUST implement the alternate behavior and MUST NOT
-      do anything else for the reasons detailed in <xref
-      target="RFC7915"></xref>. The TURN server solely relies on the DF bit in
-      the IPv4 header and Fragmentation header in IPv6 header to handle
-      fragmentation and does not rely on the DONT-FRAGMENT attribute.</t>
+      Otherwise, if that is not possible for a particular field, the server
+      MUST implement the alternate behavior and MUST NOT do anything else for
+      the reasons detailed in <xref target="RFC7915"></xref>. The TURN server
+      solely relies on the DF bit in the IPv4 header and Fragmentation header
+      in IPv6 header to handle fragmentation and does not rely on the
+      DONT-FRAGMENT attribute.</t>
 
       <section title="IPv4-to-IPv6 Translations">
         <t>Time to Live (TTL) field<list style="empty">
@@ -2557,9 +2561,9 @@ client                               server          A             B
             the outgoing packet size exceeds the outgoing link's MTU, the TURN
             server drops the outgoing packet and send an ICMP message of type
             2 code 0 ("Packet too big") to the sender of the incoming packet.
-            &nbsp;If the packet is being sent to the peer, the TURN server
-            reduces the MTU reported in the ICMP message by 48 bytes to allow
-            room for the overhead of a Data indication.</t>
+            If the ICMPv6 packet ("Packet too big") is being sent to the peer,
+            the TURN server reduces the MTU reported in the ICMP message by 48
+            bytes to allow room for the overhead of a Data indication.</t>
 
             <t>If the incoming packet included a Fragment header and the
             outgoing packet size (with a Fragment header included) does not
@@ -2622,9 +2626,10 @@ client                               server          A             B
             target="RFC7915"></xref>. Additionally, when the outgoing packet's
             size exceeds the outgoing link's MTU, the TURN server needs to
             generate an ICMP error (ICMPv6 Packet Too Big) reporting the MTU
-            size. If the packet is being sent to the peer, the TURN server
-            SHOULD reduce the MTU reported in the ICMP message by 48 bytes to
-            allow room for the overhead of a Data indication.</t>
+            size. If the ICMPv4 packet (Destination Unreachable (Type 3) with
+            Code 4) is being sent to the peer, the TURN server SHOULD reduce
+            the MTU reported in the ICMP message by 48 bytes to allow room for
+            the overhead of a Data indication.</t>
 
             <t>Alternate behavior: The TURN server assembles incoming
             fragments. The TURN server follows its default behavior to send
@@ -2729,11 +2734,11 @@ client                               server          A             B
       of authentication until UDP supports a similar authentication option
       <xref target="I-D.ietf-tsvwg-udp-options"></xref>. Even if both TCP-AO
       and UDP authentication would be used between TURN client and server, it
-      would not change the end-to-end security properties of the UDP payload
-      being relayed. Therefore applications using TURN will need to secure
-      their application data end-to-end appropriately, e.g., SRTP for RTP
-      applications. Note that TCP-AO option obsoletes TCP MD5 option. Unlike
-      UDP, TCP without the TCP Fast Open extension <xref
+      would not change the end-to-end security properties of the application
+      payload being relayed. Therefore applications using TURN will need to
+      secure their application data end-to-end appropriately, e.g., SRTP for
+      RTP applications. Note that TCP-AO option obsoletes TCP MD5 option.
+      Unlike UDP, TCP without the TCP Fast Open extension <xref
       target="RFC7413"></xref> does not support 0-RTT session resumption. The
       TCP user timeout <xref target="RFC5482"></xref> equivalent for
       application data relayed by the TURN is the use of RTP control protocol
@@ -2850,9 +2855,11 @@ client                               server          A             B
       <t>Fragmentation <list>
           <t>Preferred Behavior: Any fragmented packets are reassembled in the
           server and then forwarded to the client over the TCP connection.
-          ICMP messages resulting from the UDP datagrams sent to the peer MUST
-          be forwarded to the client using TURN's mechanism for relevant ICMP
-          types and codes.</t>
+          ICMP messages resulting from the UDP datagrams sent to the peer are
+          processed by the server as described in <xref
+          target="sec-sending-senderror-indication"></xref> and forwarded to
+          the client using TURN's mechanism for relevant ICMP types and codes.
+          </t>
 
           <t>Alternate Behavior: Same as preferred.</t>
         </list></t>
@@ -3257,7 +3264,7 @@ client                               server          A             B
   |    SOFTWARE="Example server, version 1.17"       |             |
   |    ERROR-CODE=401 (Unauthorized)   |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
   |                                    |             |             |
   |--- Allocate request -------------->|             |             |
@@ -3268,7 +3275,7 @@ client                               server          A             B
   |    DONT-FRAGMENT                   |             |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
   |    PASSWORD-ALGORITHM=SHA256       |             |             |    
   |    MESSAGE-INTEGRITY=...           |             |             |
@@ -3377,7 +3384,7 @@ client                               server          A             B
   |    XOR-PEER-ADDRESS=192.0.2.150:0  |             |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    MESSAGE-INTEGRITY=...           |             |             |
   |                                    |             |             |
   |<-- CreatePermission success resp.--|             |             |
@@ -3471,7 +3478,7 @@ client                               server          A             B
   |    XOR-PEER-ADDRESS=192.0.2.210:49191            |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    MESSAGE-INTEGRITY=...           |             |             |
   |                                    |             |             |
   |<-- ChannelBind success response ---|             |             |
@@ -3540,7 +3547,7 @@ client                               server          A             B
   |    XOR-PEER-ADDRESS=192.0.2.210:49191            |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    MESSAGE-INTEGRITY=...           |             |             |
   |                                    |             |             |
   |<-- ChannelBind success response ---|             |             |
@@ -3565,7 +3572,7 @@ client                               server          A             B
   |    SOFTWARE="Example client 1.03"  |             |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"      |             |
+  |    NONCE="oobMatJos2gAAAadl7W7PeDU4hKE72jda"     |             |
   |    MESSAGE-INTEGRITY=...           |             |             |
   |                                    |             |             |
   |<-- Refresh error response ---------|             |             |
@@ -3573,7 +3580,7 @@ client                               server          A             B
   |    SOFTWARE="Example server, version 1.17"       |             |
   |    ERROR-CODE=438 (Stale Nonce)    |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABnpSw1Xw239bBwGYhjN"       |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
   |                                    |             |             |
   |--- Refresh request --------------->|             |             |
@@ -3581,7 +3588,7 @@ client                               server          A             B
   |    SOFTWARE="Example client 1.03"  |             |             |
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
-  |    NONCE="obMatJos2AAABnpSw1Xw239bBwGYhjNj"      |             |
+  |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
   |    PASSWORD-ALGORITHM=SHA256       |             |             | 
   |    MESSAGE-INTEGRITY=...           |             |             |
@@ -3738,28 +3745,33 @@ client                               server          A             B
 
         <section title="Eavesdropping Traffic">
           <t>If the TURN client and server use the STUN Extension for
-          Third-Party Authorization <xref target="RFC7635"></xref>, the
-          username does not reveal the real user's identity, the USERNAME
-          attribute carries an ephemeral and unique key identifier, and the
-          key identifier can change per call. If the TURN client and server
-          use the STUN long-term credential mechanism and the username reveals
-          the real user's identity, the client needs to use (D)TLS transport
-          between the client and the server or use the USERHASH attribute
-          instead of the USERNAME attribute to anonynmize the username.</t>
+          Third-Party Authorization <xref target="RFC7635"></xref> (for
+          example it is used in WebRTC), the username does not reveal the real
+          user's identity, the USERNAME attribute carries an ephemeral and
+          unique key identifier. If the TURN client and server use the STUN
+          long-term credential mechanism and the username reveals the real
+          user's identity, the client needs to use (D)TLS transport between
+          the client and the server or use the USERHASH attribute instead of
+          the USERNAME attribute to anonynmize the username.</t>
 
-          <t>SOFWATE attribute can reveal the specific software version of the
-          TURN client and server to eavesdropper and it might possibly allow
-          attacks against vulnerable software that is known to contain
+          <t>If the TURN client and server use the STUN long-term credential
+          mechanism and realm information is privacy sensitive, TURN can be
+          run over (D)TLS. As a reminder, STUN Extension for Third-Party
+          Authorization does not use realm.</t>
+
+          <t>SOFTWARE attribute can reveal the specific software version of
+          the TURN client and server to eavesdropper and it might possibly
+          allow attacks against vulnerable software that is known to contain
           security holes. If it is important to prevent an eavesdropper from
           learning the software version, TURN can be run over (D)TLS.</t>
 
           <t>TURN concerns itself primarily with authentication and message
           integrity. Confidentiality is only a secondary concern, as TURN
           control messages do not include information that is particularly
-          sensitive. The primary protocol content of the messages is the IP
-          address of the peer. If it is important to prevent an eavesdropper
-          on a TURN connection from learning this, TURN can be run over
-          (D)TLS.</t>
+          sensitive, with the exception of USERNAME, REALM and SOFTWARE. The
+          primary protocol content of the messages is the IP address of the
+          peer. If it is important to prevent an eavesdropper on a TURN
+          connection from learning this, TURN can be run over (D)TLS.</t>
 
           <t>Confidentiality for the application data relayed by TURN is best
           provided by the application protocol itself, since running TURN over
@@ -4025,9 +4037,9 @@ client                               server          A             B
 
       <t>The codepoints for the STUN error codes defined in this specification
       are listed in <xref target="sec-stun-errors"></xref>. [IANA is requested
-      to update the reference from <xref target="RFC5766"></xref> to RFC-to-be
-      for the STUN error codes listed in <xref
-      target="sec-stun-errors"></xref>.]</t>
+      to update the reference from <xref target="RFC5766"></xref> and <xref
+      target="RFC6156"></xref> to RFC-to-be for the STUN error codes listed in
+      <xref target="sec-stun-errors"></xref>.]</t>
 
       <t>IANA has allocated the SRV service name of "turn" for TURN over UDP
       or TCP, and the service name of "turns" for TURN over (D)TLS.</t>
@@ -4275,6 +4287,8 @@ client                               server          A             B
 
       <?rfc include='reference.I-D.ietf-tsvwg-udp-options'?>
 
+      <?rfc include='reference.I-D.ietf-intarea-frag-fragile'?>
+
       <?rfc include="reference.RFC.8155"?>
 
       <?rfc include='reference.RFC.4086'?>
@@ -4315,15 +4329,43 @@ client                               server          A             B
       </reference>
 
       <reference anchor="Frag-Harmful"
-                 target="Proc. SIGCOMM &lsquo;87, vol. 17, No. 5, October 1987">
+                 target="http://www.hpl.hp.com/techreports/Compaq-DEC/WRL-87-3.pdf">
         <front>
-          <title>Fragmentation Considered Harmful</title>
+          <title>"Fragmentation Considered Harmful", In Proc. SIGCOMM '87
+          Workshop on Frontiers in Computer Communications Technology, DOI
+          10.1145/55483.55524</title>
 
-          <author>
+          <author fullname="Kent" initials="C. " surname="Kent">
             <organization></organization>
           </author>
 
-          <date year="" />
+          <author fullname="Mogul" initials="J." surname="Mogul">
+            <organization></organization>
+
+            <address>
+              <postal>
+                <street></street>
+
+                <city></city>
+
+                <region></region>
+
+                <code></code>
+
+                <country></country>
+              </postal>
+
+              <phone></phone>
+
+              <facsimile></facsimile>
+
+              <email></email>
+
+              <uri></uri>
+            </address>
+          </author>
+
+          <date month="August" year="1987" />
         </front>
       </reference>
     </references>
