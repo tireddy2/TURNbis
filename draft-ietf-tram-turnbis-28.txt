@@ -6,11 +6,11 @@ TRAM WG                                                    T. Reddy, Ed.
 Internet-Draft                                                    McAfee
 Obsoletes: 5766, 6156 (if approved)                     A. Johnston, Ed.
 Intended status: Standards Track                    Villanova University
-Expires: January 11, 2020                                    P. Matthews
+Expires: January 17, 2020                                    P. Matthews
                                                           Alcatel-Lucent
                                                             J. Rosenberg
                                                              jdrosen.net
-                                                           July 10, 2019
+                                                           July 16, 2019
 
 
  Traversal Using Relays around NAT (TURN): Relay Extensions to Session
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Reddy, et al.           Expires January 11, 2020                [Page 1]
+Reddy, et al.           Expires January 17, 2020                [Page 1]
 
 Internet-Draft                    TURN                         July 2019
 
 
-   This Internet-Draft will expire on January 11, 2020.
+   This Internet-Draft will expire on January 17, 2020.
 
 Copyright Notice
 
@@ -99,17 +99,17 @@ Table of Contents
      7.3.  Receiving an Allocate Success Response  . . . . . . . . .  33
      7.4.  Receiving an Allocate Error Response  . . . . . . . . . .  34
    8.  Refreshing an Allocation  . . . . . . . . . . . . . . . . . .  36
-     8.1.  Sending a Refresh Request . . . . . . . . . . . . . . . .  36
+     8.1.  Sending a Refresh Request . . . . . . . . . . . . . . . .  37
      8.2.  Receiving a Refresh Request . . . . . . . . . . . . . . .  37
      8.3.  Receiving a Refresh Response  . . . . . . . . . . . . . .  38
    9.  Permissions . . . . . . . . . . . . . . . . . . . . . . . . .  38
-   10. CreatePermission  . . . . . . . . . . . . . . . . . . . . . .  39
-     10.1.  Forming a CreatePermission Request . . . . . . . . . . .  39
+   10. CreatePermission  . . . . . . . . . . . . . . . . . . . . . .  40
+     10.1.  Forming a CreatePermission Request . . . . . . . . . . .  40
      10.2.  Receiving a CreatePermission Request . . . . . . . . . .  40
 
 
 
-Reddy, et al.           Expires January 11, 2020                [Page 2]
+Reddy, et al.           Expires January 17, 2020                [Page 2]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -117,43 +117,43 @@ Internet-Draft                    TURN                         July 2019
      10.3.  Receiving a CreatePermission Response  . . . . . . . . .  41
    11. Send and Data Methods . . . . . . . . . . . . . . . . . . . .  41
      11.1.  Forming a Send Indication  . . . . . . . . . . . . . . .  41
-     11.2.  Receiving a Send Indication  . . . . . . . . . . . . . .  41
+     11.2.  Receiving a Send Indication  . . . . . . . . . . . . . .  42
      11.3.  Receiving a UDP Datagram . . . . . . . . . . . . . . . .  42
      11.4.  Receiving a Data Indication  . . . . . . . . . . . . . .  43
      11.5.  Receiving an ICMP Packet . . . . . . . . . . . . . . . .  43
      11.6.  Receiving a Data Indication with an ICMP attribute . . .  44
-   12. Channels  . . . . . . . . . . . . . . . . . . . . . . . . . .  44
-     12.1.  Sending a ChannelBind Request  . . . . . . . . . . . . .  46
-     12.2.  Receiving a ChannelBind Request  . . . . . . . . . . . .  47
-     12.3.  Receiving a ChannelBind Response . . . . . . . . . . . .  48
-     12.4.  The ChannelData Message  . . . . . . . . . . . . . . . .  48
-     12.5.  Sending a ChannelData Message  . . . . . . . . . . . . .  49
+   12. Channels  . . . . . . . . . . . . . . . . . . . . . . . . . .  45
+     12.1.  Sending a ChannelBind Request  . . . . . . . . . . . . .  47
+     12.2.  Receiving a ChannelBind Request  . . . . . . . . . . . .  48
+     12.3.  Receiving a ChannelBind Response . . . . . . . . . . . .  49
+     12.4.  The ChannelData Message  . . . . . . . . . . . . . . . .  49
+     12.5.  Sending a ChannelData Message  . . . . . . . . . . . . .  50
      12.6.  Receiving a ChannelData Message  . . . . . . . . . . . .  50
      12.7.  Relaying Data from the Peer  . . . . . . . . . . . . . .  51
    13. Packet Translations . . . . . . . . . . . . . . . . . . . . .  51
-     13.1.  IPv4-to-IPv6 Translations  . . . . . . . . . . . . . . .  51
-     13.2.  IPv6-to-IPv6 Translations  . . . . . . . . . . . . . . .  52
-     13.3.  IPv6-to-IPv4 Translations  . . . . . . . . . . . . . . .  54
+     13.1.  IPv4-to-IPv6 Translations  . . . . . . . . . . . . . . .  52
+     13.2.  IPv6-to-IPv6 Translations  . . . . . . . . . . . . . . .  53
+     13.3.  IPv6-to-IPv4 Translations  . . . . . . . . . . . . . . .  55
    14. UDP-to-UDP relay  . . . . . . . . . . . . . . . . . . . . . .  55
-   15. TCP-to-UDP relay  . . . . . . . . . . . . . . . . . . . . . .  56
-   16. UDP-to-TCP relay  . . . . . . . . . . . . . . . . . . . . . .  58
-   17. STUN Methods  . . . . . . . . . . . . . . . . . . . . . . . .  59
-   18. STUN Attributes . . . . . . . . . . . . . . . . . . . . . . .  59
-     18.1.  CHANNEL-NUMBER . . . . . . . . . . . . . . . . . . . . .  60
-     18.2.  LIFETIME . . . . . . . . . . . . . . . . . . . . . . . .  60
+   15. TCP-to-UDP relay  . . . . . . . . . . . . . . . . . . . . . .  57
+   16. UDP-to-TCP relay  . . . . . . . . . . . . . . . . . . . . . .  59
+   17. STUN Methods  . . . . . . . . . . . . . . . . . . . . . . . .  60
+   18. STUN Attributes . . . . . . . . . . . . . . . . . . . . . . .  60
+     18.1.  CHANNEL-NUMBER . . . . . . . . . . . . . . . . . . . . .  61
+     18.2.  LIFETIME . . . . . . . . . . . . . . . . . . . . . . . .  61
      18.3.  XOR-PEER-ADDRESS . . . . . . . . . . . . . . . . . . . .  61
      18.4.  DATA . . . . . . . . . . . . . . . . . . . . . . . . . .  61
-     18.5.  XOR-RELAYED-ADDRESS  . . . . . . . . . . . . . . . . . .  61
-     18.6.  REQUESTED-ADDRESS-FAMILY . . . . . . . . . . . . . . . .  61
+     18.5.  XOR-RELAYED-ADDRESS  . . . . . . . . . . . . . . . . . .  62
+     18.6.  REQUESTED-ADDRESS-FAMILY . . . . . . . . . . . . . . . .  62
      18.7.  EVEN-PORT  . . . . . . . . . . . . . . . . . . . . . . .  62
-     18.8.  REQUESTED-TRANSPORT  . . . . . . . . . . . . . . . . . .  62
+     18.8.  REQUESTED-TRANSPORT  . . . . . . . . . . . . . . . . . .  63
      18.9.  DONT-FRAGMENT  . . . . . . . . . . . . . . . . . . . . .  63
      18.10. RESERVATION-TOKEN  . . . . . . . . . . . . . . . . . . .  63
-     18.11. ADDITIONAL-ADDRESS-FAMILY  . . . . . . . . . . . . . . .  63
-     18.12. ADDRESS-ERROR-CODE Attribute . . . . . . . . . . . . . .  63
-     18.13. ICMP Attribute . . . . . . . . . . . . . . . . . . . . .  64
+     18.11. ADDITIONAL-ADDRESS-FAMILY  . . . . . . . . . . . . . . .  64
+     18.12. ADDRESS-ERROR-CODE . . . . . . . . . . . . . . . . . . .  64
+     18.13. ICMP . . . . . . . . . . . . . . . . . . . . . . . . . .  65
    19. STUN Error Response Codes . . . . . . . . . . . . . . . . . .  65
-   20. Detailed Example  . . . . . . . . . . . . . . . . . . . . . .  65
+   20. Detailed Example  . . . . . . . . . . . . . . . . . . . . . .  66
    21. Security Considerations . . . . . . . . . . . . . . . . . . .  74
      21.1.  Outsider Attacks . . . . . . . . . . . . . . . . . . . .  74
        21.1.1.  Obtaining Unauthorized Allocations . . . . . . . . .  74
@@ -165,7 +165,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020                [Page 3]
+Reddy, et al.           Expires January 17, 2020                [Page 3]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -176,7 +176,7 @@ Internet-Draft                    TURN                         July 2019
        21.2.2.  Blacklisted IP Addresses . . . . . . . . . . . . . .  79
        21.2.3.  Running Servers on Well-Known Ports  . . . . . . . .  79
      21.3.  Insider Attacks  . . . . . . . . . . . . . . . . . . . .  79
-       21.3.1.  DoS against TURN Server  . . . . . . . . . . . . . .  79
+       21.3.1.  DoS against TURN Server  . . . . . . . . . . . . . .  80
        21.3.2.  Anonymous Relaying of Malicious Traffic  . . . . . .  80
        21.3.3.  Manipulating Other Allocations . . . . . . . . . . .  80
      21.4.  Tunnel Amplification Attack  . . . . . . . . . . . . . .  80
@@ -188,8 +188,8 @@ Internet-Draft                    TURN                         July 2019
    26. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  85
    27. References  . . . . . . . . . . . . . . . . . . . . . . . . .  85
      27.1.  Normative References . . . . . . . . . . . . . . . . . .  85
-     27.2.  Informative References . . . . . . . . . . . . . . . . .  88
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  91
+     27.2.  Informative References . . . . . . . . . . . . . . . . .  87
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  92
 
 1.  Introduction
 
@@ -215,19 +215,23 @@ Internet-Draft                    TURN                         July 2019
    In many enterprise networks, direct UDP transmissions are not
    permitted between clients on the internal networks and external IP
    addresses.  To permit media sessions in such a situation to use UDP
-   and to avoid forcing the media sessions through TCP, Enterprise
+   and to avoid forcing the media sessions through TCP, an Enterprise
    Firewall can be configured to allow UDP traffic relayed through an
+   Enterprise relay server.  This scenario is required to be supported
 
 
 
-
-Reddy, et al.           Expires January 11, 2020                [Page 4]
+Reddy, et al.           Expires January 17, 2020                [Page 4]
 
 Internet-Draft                    TURN                         July 2019
 
 
-   Enterprise relay server.  This scenario is required to be supported
-   by the WebRTC requirements (Section 2.3.5.1 in [RFC7478]).
+   by the WebRTC requirements (Section 2.3.5.1 in [RFC7478]).  In
+   addition, in a SIP or WebRTC call, if the user wants IP location
+   privacy from the peer then the client can select a relay server
+   offering IP location privacy and only convey the relayed candidates
+   to the peer for ICE connectivity checks (see Section 4.2.4 in
+   [I-D.ietf-rtcweb-security]).
 
    This specification defines a protocol, called TURN, that allows a
    host behind a NAT (called the TURN client) to request that another
@@ -270,17 +274,17 @@ Internet-Draft                    TURN                         July 2019
    high-bandwidth connection to the Internet.  As a consequence, it is
    best to use a TURN server only when a direct communication path
    cannot be found.  When the client and a peer use ICE to determine the
-   communication path, ICE will use hole punching techniques to search
-   for a direct path first and only use a TURN server when a direct path
-   cannot be found.
 
 
 
-
-Reddy, et al.           Expires January 11, 2020                [Page 5]
+Reddy, et al.           Expires January 17, 2020                [Page 5]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   communication path, ICE will use hole punching techniques to search
+   for a direct path first and only use a TURN server when a direct path
+   cannot be found.
 
    TURN was originally invented to support multimedia sessions signaled
    using SIP.  Since SIP supports forking, TURN supports multiple peers
@@ -325,19 +329,19 @@ Internet-Draft                    TURN                         July 2019
    TURN server:  A STUN server that implements this specification.  It
       relays data between a TURN client and its peer(s).
 
-   Peer:  A host with which the TURN client wishes to communicate.  The
-      TURN server relays traffic between the TURN client and its
-      peer(s).  The peer does not interact with the TURN server using
-      the protocol defined in this document; rather, the peer receives
 
 
 
 
-Reddy, et al.           Expires January 11, 2020                [Page 6]
+Reddy, et al.           Expires January 17, 2020                [Page 6]
 
 Internet-Draft                    TURN                         July 2019
 
 
+   Peer:  A host with which the TURN client wishes to communicate.  The
+      TURN server relays traffic between the TURN client and its
+      peer(s).  The peer does not interact with the TURN server using
+      the protocol defined in this document; rather, the peer receives
       data sent by the TURN server and the peer sends data towards the
       TURN server.
 
@@ -382,17 +386,16 @@ Internet-Draft                    TURN                         July 2019
 
    Channel:  A channel number and associated peer transport address.
       Once a channel number is bound to a peer's transport address, the
-      client and server can use the more bandwidth-efficient ChannelData
-      message to exchange data.
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020                [Page 7]
+Reddy, et al.           Expires January 17, 2020                [Page 7]
 
 Internet-Draft                    TURN                         July 2019
 
+
+      client and server can use the more bandwidth-efficient ChannelData
+      message to exchange data.
 
    Permission:  The IP address and transport protocol (but not the port)
       of a peer that is permitted to send traffic to the TURN server and
@@ -442,10 +445,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-
-Reddy, et al.           Expires January 11, 2020                [Page 8]
+Reddy, et al.           Expires January 17, 2020                [Page 8]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -501,7 +501,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020                [Page 9]
+Reddy, et al.           Expires January 17, 2020                [Page 9]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -543,8 +543,8 @@ Internet-Draft                    TURN                         July 2019
    (Peer A's host transport address).
 
    Each allocation on the server belongs to a single client and has
-   exactly one relayed transport address that is used only by that
-   allocation.  Thus, when a packet arrives at a relayed transport
+   exactly one or two relayed transport addresses that is used only by
+   that allocation.  Thus, when a packet arrives at a relayed transport
    address on the server, the server knows for which client the data is
    intended.
 
@@ -557,7 +557,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 10]
+Reddy, et al.           Expires January 17, 2020               [Page 10]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -608,21 +608,21 @@ Internet-Draft                    TURN                         July 2019
    confidentiality of TURN control messages.  If (D)TLS transport is
    used between the TURN client and the TURN server, the cipher suites,
    server certificate validation and authentication of TURN server are
-   discussed in Section 6.2.3 of [I-D.ietf-tram-stunbis] and the
-   guidance given in [RFC7525] MUST be followed to avoid attacks on
+   discussed in Section 6.2.3 of [I-D.ietf-tram-stunbis]. The guidance
+   given in [RFC7525] MUST be followed to avoid attacks on (D)TLS.  TURN
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 11]
+Reddy, et al.           Expires January 17, 2020               [Page 11]
 
 Internet-Draft                    TURN                         July 2019
 
 
-   (D)TLS.  TURN does not require (D)TLS because the overhead of using
-   (D)TLS is higher than that of digest authentication; for example,
-   using (D)TLS likely means that most application data will be doubly
-   encrypted (once by (D)TLS and once to ensure it is still encrypted in
-   the UDP datagram).
+   does not require (D)TLS because the overhead of using (D)TLS is
+   higher than that of digest authentication; for example, using (D)TLS
+   likely means that most application data will be doubly encrypted
+   (once by (D)TLS and once to ensure it is still encrypted in the UDP
+   datagram).
 
    There is an extension to TURN for TCP transport between the server
    and the peers [RFC6062].  For this reason, allocations that use UDP
@@ -669,7 +669,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 12]
+Reddy, et al.           Expires January 17, 2020               [Page 12]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -725,7 +725,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 13]
+Reddy, et al.           Expires January 17, 2020               [Page 13]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -781,7 +781,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 14]
+Reddy, et al.           Expires January 17, 2020               [Page 14]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -837,7 +837,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 15]
+Reddy, et al.           Expires January 17, 2020               [Page 15]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -893,7 +893,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 16]
+Reddy, et al.           Expires January 17, 2020               [Page 16]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -949,7 +949,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 17]
+Reddy, et al.           Expires January 17, 2020               [Page 17]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1005,7 +1005,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 18]
+Reddy, et al.           Expires January 17, 2020               [Page 18]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1048,23 +1048,26 @@ Internet-Draft                    TURN                         July 2019
 
    For reasons described in [Frag-Harmful], applications, especially
    those sending large volumes of data, should avoid having their
-   packets fragmented.  Applications using TCP can more or less ignore
-   this issue because fragmentation avoidance is now a standard part of
-   TCP, but applications using UDP (and thus any application using this
+   packets fragmented.  [I-D.ietf-intarea-frag-fragile] discusses issues
+   associated with IP fragmentation and proposes alternatives to IP
+   fragmentation.  Applications using TCP can more or less ignore this
+   issue because fragmentation avoidance is now a standard part of TCP,
+   but applications using UDP (and thus any application using this
    version of TURN) need to avoid IP fragmentation by sending
    sufficiently small messages or use UDP fragmentation
-   [I-D.ietf-tsvwg-udp-options].  [I-D.ietf-intarea-frag-fragile]
-   discusses issues associated with IP fragmentation and proposes
-   alternatives to IP fragmentation.
+   [I-D.ietf-tsvwg-udp-options].  Note that the UDP fragmentation option
+   needs to be supported by both endpoints, and at the time of writing
 
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 19]
+Reddy, et al.           Expires January 17, 2020               [Page 19]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   of this document, UDP fragmentation support is under discussion and
+   is not deployed.
 
    The application running on the client and the peer can take one of
    two approaches to avoid IP fragmentation until UDP fragmentation
@@ -1112,15 +1115,14 @@ Internet-Draft                    TURN                         July 2019
       - a probe packet with DF bit in the IPv4 header set to test a path
       for a larger MTU can be dropped by routers, or
 
-      - ICMP error messages can be dropped by middle boxes.
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 20]
+Reddy, et al.           Expires January 17, 2020               [Page 20]
 
 Internet-Draft                    TURN                         July 2019
 
+
+      - ICMP error messages can be dropped by middle boxes.
 
    As a result, the client and server need to use a path MTU discovery
    algorithm that does not require ICMP messages.  The Packetized Path
@@ -1136,9 +1138,9 @@ Internet-Draft                    TURN                         July 2019
    also include this attribute in the Allocate request -- any server
    that does not support the DONT-FRAGMENT attribute will indicate this
    by rejecting the Allocate request.  If the TURN server carrying out
-   packet translation from IPv4-to-IPv6 cannot get the Don't Fragment
-   (DF) bit in the IPv4 header, it MUST reject the Allocate request with
-   DONT-FRAGMENT attribute.
+   packet translation from IPv4-to-IPv6 is unable to access the state of
+   Don't Fragment (DF) bit in the IPv4 header, it MUST reject the
+   Allocate request with DONT-FRAGMENT attribute.
 
 3.8.  RTP Support
 
@@ -1171,9 +1173,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 21]
+Reddy, et al.           Expires January 17, 2020               [Page 21]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1229,7 +1229,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 22]
+Reddy, et al.           Expires January 17, 2020               [Page 22]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1253,10 +1253,7 @@ Internet-Draft                    TURN                         July 2019
 
    [I-D.ietf-tram-stunbis] specifies an authentication mechanism called
    the long-term credential mechanism.  TURN servers and clients MUST
-   implement this mechanism.  The server SHOULD demand that all requests
-   from the client be authenticated using this mechanism, or that a
-   equally strong or stronger mechanism for client authentication is
-   used.
+   implement this mechanism.
 
    Note that the long-term credential mechanism applies only to requests
    and cannot be used to authenticate indications; thus, indications in
@@ -1282,16 +1279,16 @@ Internet-Draft                    TURN                         July 2019
    requires the use of the long-term credential mechanism, and if a non-
    Allocate request passes authentication under this mechanism, and if
    the 5-tuple identifies an existing allocation, but the request does
+   not use the same username as used to create the allocation, then the
+   request MUST be rejected with a 441 (Wrong Credentials) error.
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 23]
+
+Reddy, et al.           Expires January 17, 2020               [Page 23]
 
 Internet-Draft                    TURN                         July 2019
 
-
-   not use the same username as used to create the allocation, then the
-   request MUST be rejected with a 441 (Wrong Credentials) error.
 
    When a TURN message arrives at the server from the client, the server
    uses the 5-tuple in the message to identify the associated
@@ -1337,19 +1334,18 @@ Internet-Draft                    TURN                         July 2019
    transport between the client and the server, and SHOULD support the
    use of TCP, TLS-over-TCP and DTLS-over-UDP transports.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 24]
-
-Internet-Draft                    TURN                         July 2019
-
-
    When UDP or DTLS-over-UDP transport is used between the client and
    the server, the client will retransmit a request if it does not
    receive a response within a certain timeout period.  Because of this,
    the server may receive two (or more) requests with the same 5-tuple
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 24]
+
+Internet-Draft                    TURN                         July 2019
+
+
    and same transaction id.  STUN requires that the server recognize
    this case and treat the request as idempotent (see
    [I-D.ietf-tram-stunbis]).  Some implementations may choose to meet
@@ -1370,8 +1366,9 @@ Internet-Draft                    TURN                         July 2019
    on the amount of bandwidth those allocations can use.  The server
    should reject new allocations that would exceed the limit on the
    allowed number of allocations active at one time with a 486
-   (Allocation Quota Exceeded) (see Section 7.2), and should discard
-   application data traffic that exceeds the bandwidth quota.
+   (Allocation Quota Exceeded) (see Section 7.2), and since UDP does not
+   include a congestion control mechanism, it should discard application
+   data traffic that exceeds the bandwidth quota.
 
 6.  Allocations
 
@@ -1393,27 +1390,23 @@ Internet-Draft                    TURN                         July 2019
    o  a list of channel to peer bindings for each relayed transport
       address.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 25]
-
-Internet-Draft                    TURN                         July 2019
-
-
    The relayed transport address is the transport address allocated by
    the server for communicating with peers, while the 5-tuple describes
    the communication path between the client and the server.  On the
    client, the 5-tuple uses the client's host transport address; on the
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 25]
+
+Internet-Draft                    TURN                         July 2019
+
+
    server, the 5-tuple uses the client's server-reflexive transport
    address.  The relayed transport address MUST be unique across all
-   allocations, so it can be used to uniquely identify the allocation.
-
-   Both the relayed transport address and the 5-tuple MUST be unique
-   across all allocations, so either one can be used to uniquely
-   identify the allocation, and an allocation in this context can be
-   either a single or dual allocation.
+   allocations so it can be used to uniquely identify the allocation,
+   and an allocation in this context can be either a single or dual
+   allocation.
 
    The authentication information (e.g., username, password, realm, and
    nonce) is used to both verify subsequent requests and to compute the
@@ -1425,6 +1418,11 @@ Internet-Draft                    TURN                         July 2019
    explicitly and MUST store the key value, which is a cryptographic
    hash over the username, realm, and password (see Section 16.1.3 in
    [I-D.ietf-tram-stunbis]).
+
+   Note that if the response contains a PASSWORD-ALGORITHMS attribute
+   and this attribute contains both MD5 and SHA-256 algorithms, and the
+   client also supports both the algorithms, the request MUST contain a
+   PASSWORD-ALGORITHM attribute with the SHA-256 algorithm.
 
    The time-to-expiry is the time in seconds left until the allocation
    expires.  Each Allocate or Refresh transaction sets this timer, which
@@ -1448,12 +1446,14 @@ Internet-Draft                    TURN                         July 2019
    The client forms an Allocate request as follows.
 
    The client first picks a host transport address.  It is RECOMMENDED
-   that the client pick a currently unused transport address, typically
+   that the client picks a currently unused transport address, typically
    by allowing the underlying OS to pick a currently unused port.
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 26]
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 26]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1509,7 +1509,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 27]
+Reddy, et al.           Expires January 17, 2020               [Page 27]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -1552,24 +1552,25 @@ Internet-Draft                    TURN                         July 2019
    When the server receives an Allocate request, it performs the
    following checks:
 
-   1.   The server SHOULD require that the request be authenticated.
-        The authentication of the request is optional to allow TURN
-        servers provided by the local or access network to accept
-        Allocation requests from new and/or guest users in the network
-        who do not necessarily possess long term credentials for STUN
-        authentication and its security implications are discussed in
-        [RFC8155].  If the request is authenticated, the authentication
-        MUST be done using the long-term credential mechanism of
-        [I-D.ietf-tram-stunbis] unless the client and server agree to
+   1.   The TURN server provided by the local or access network MAY
+        allow unauthenticated request in order to accept Allocation
+        requests from new and/or guest users in the network who do not
+        necessarily possess long term credentials for STUN
+        authentication.  Making STUN authentication optional and its
+        security implications are discussed in [RFC8155].  Otherwise,
+        the server MUST require that the request be authenticated.  If
+        the request is authenticated, the authentication MUST be done
+        either using the long-term credential mechanism of
+        [I-D.ietf-tram-stunbis] or the STUN Extension for Third-Party
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 28]
+Reddy, et al.           Expires January 17, 2020               [Page 28]
 
 Internet-Draft                    TURN                         July 2019
 
 
+        Authorization [RFC7635] unless the client and server agree to
         use another mechanism through some procedure outside the scope
         of this document.
 
@@ -1616,15 +1617,17 @@ Internet-Draft                    TURN                         July 2019
         server MUST include an ERROR-CODE attribute with the 440
         (Address Family not Supported) response code.  If the REQUESTED-
         ADDRESS-FAMILY attribute is absent and the server supports IPv4
-        address family, the server MUST allocate an IPv4 relayed
-        transport address for the TURN client.
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 29]
+
+Reddy, et al.           Expires January 17, 2020               [Page 29]
 
 Internet-Draft                    TURN                         July 2019
 
+
+        address family, the server MUST allocate an IPv4 relayed
+        transport address for the TURN client.
 
    8.   The server checks if the request contains an EVEN-PORT attribute
         with the R bit set to 1.  If yes, and the request also contains
@@ -1645,12 +1648,12 @@ Internet-Draft                    TURN                         July 2019
         server can partially meet the request, i.e. if it can only
         allocate one relayed transport address of a specific address
         type, then it includes ADDRESS-ERROR-CODE attribute in the
-        response to inform the client the reason for partial failure of
-        the request.  The error code value signaled in the ADDRESS-
-        ERROR-CODE attribute could be 440 (Address Family not Supported)
-        or 508 (Insufficient Capacity).  If the server can fully meet
-        the request, then the server allocates one IPv4 and one IPv6
-        relay address, and returns an Allocate success response
+        success response to inform the client the reason for partial
+        failure of the request.  The error code value signaled in the
+        ADDRESS-ERROR-CODE attribute could be 440 (Address Family not
+        Supported) or 508 (Insufficient Capacity).  If the server can
+        fully meet the request, then the server allocates one IPv4 and
+        one IPv6 relay address, and returns an Allocate success response
         containing the relayed transport addresses assigned to the dual
         allocation in two XOR-RELAYED-ADDRESS attributes.
 
@@ -1671,16 +1674,16 @@ Internet-Draft                    TURN                         July 2019
    5-tuple is set to the 5-tuple from the Allocate request, while the
    list of permissions and the list of channels are initially empty.
 
-   The server chooses a relayed transport address for the allocation as
-   follows:
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 30]
+Reddy, et al.           Expires January 17, 2020               [Page 30]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   The server chooses a relayed transport address for the allocation as
+   follows:
 
    o  If the request contains a RESERVATION-TOKEN attribute, the server
       uses the previously reserved transport address corresponding to
@@ -1726,18 +1729,19 @@ Internet-Draft                    TURN                         July 2019
    Known Port range) to discourage clients from using TURN to run
    standard services.
 
-      NOTE: The use of randomized port assignments to avoid certain
-      types of attacks is described in [RFC6056].  It is RECOMMENDED
-      that a TURN server implement a randomized port assignment
-      algorithm from [RFC6056].  This is especially applicable to
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 31]
+
+Reddy, et al.           Expires January 17, 2020               [Page 31]
 
 Internet-Draft                    TURN                         July 2019
 
 
+      NOTE: The use of randomized port assignments to avoid certain
+      types of attacks is described in [RFC6056].  It is RECOMMENDED
+      that a TURN server implement a randomized port assignment
+      algorithm from [RFC6056].  This is especially applicable to
       servers that choose to pre-allocate a number of ports from the
       underlying OS and then later assign them to allocations; for
       example, a server may choose this technique to implement the EVEN-
@@ -1764,7 +1768,8 @@ Internet-Draft                    TURN                         July 2019
    response.  The success response contains:
 
    o  An XOR-RELAYED-ADDRESS attribute containing the relayed transport
-      address.
+      address or two XOR-RELAYED-ADDRESS attributes containing the
+      relayed transport addresses.
 
    o  A LIFETIME attribute containing the current value of the time-to-
       expiry timer.
@@ -1781,19 +1786,19 @@ Internet-Draft                    TURN                         July 2019
       can thus avoid having to do an extra Binding transaction with some
       STUN server to learn it.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 32]
+
+Internet-Draft                    TURN                         July 2019
+
+
    The response (either success or error) is sent back to the client on
    the 5-tuple.
 
       NOTE: When the Allocate request is sent over UDP,
       [I-D.ietf-tram-stunbis] requires that the server handle the
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 32]
-
-Internet-Draft                    TURN                         July 2019
-
-
       possible retransmissions of the request so that retransmissions do
       not cause multiple allocations to be created.  Implementations may
       achieve this using the so-called "stateless stack approach" as
@@ -1837,19 +1842,19 @@ Internet-Draft                    TURN                         July 2019
    MUST NOT attempt to create another allocation on that server until it
    believes the mismatch has been fixed.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 33]
+
+Internet-Draft                    TURN                         July 2019
+
+
    Otherwise, the client creates its own copy of the allocation data
    structure to track what is happening on the server.  In particular,
    the client needs to remember the actual lifetime received back from
    the server, rather than the value sent to the server in the request.
    The client must also remember the 5-tuple used for the request and
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 33]
-
-Internet-Draft                    TURN                         July 2019
-
-
    the username and password it used to authenticate the request to
    ensure that it reuses them for subsequent messages.  The client also
    needs to track the channels and permissions it establishes on the
@@ -1893,18 +1898,17 @@ Internet-Draft                    TURN                         July 2019
 
    o  400 (Bad Request): The server believes the client's request is
       malformed for some reason.  The client considers the current
-      transaction as having failed.  The client MAY notify the user or
-      operator and SHOULD NOT retry the request with this server until
-      it believes the problem has been fixed.
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 34]
+Reddy, et al.           Expires January 17, 2020               [Page 34]
 
 Internet-Draft                    TURN                         July 2019
 
+
+      transaction as having failed.  The client MAY notify the user or
+      operator and SHOULD NOT retry the request with this server until
+      it believes the problem has been fixed.
 
    o  401 (Unauthorized): If the client has followed the procedures of
       the long-term credential mechanism and still gets this error, then
@@ -1950,17 +1954,18 @@ Internet-Draft                    TURN                         July 2019
       receives an Allocate error response with the 440 (Unsupported
       Address Family) error code, the client MUST NOT retry the request.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 35]
+
+Internet-Draft                    TURN                         July 2019
+
+
    o  441 (Wrong Credentials): The client should not receive this error
       in response to a Allocate request.  The client MAY notify the user
       or operator and SHOULD NOT retry the same request with this server
       until it believes the problem has been fixed.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 35]
-
-Internet-Draft                    TURN                         July 2019
-
 
    o  442 (Unsupported Transport Address): The client should not receive
       this error in response to a request for a UDP allocation.  The
@@ -1984,6 +1989,11 @@ Internet-Draft                    TURN                         July 2019
       wait at least 1 minute before trying to create any more
       allocations on this server.
 
+   Note that the error code values 486 and 508 indicate to a
+   eavesdropper that several other users are using the server at this
+   time, similar to that of the HTTP error response code 503, but does
+   not reveal any information about the users using the TURN server.
+
    An unknown error response MUST be handled as described in
    [I-D.ietf-tram-stunbis].
 
@@ -2000,6 +2010,14 @@ Internet-Draft                    TURN                         July 2019
    explicitly delete the allocation.  A client MAY refresh an allocation
    at any time for other reasons.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 36]
+
+Internet-Draft                    TURN                         July 2019
+
+
 8.1.  Sending a Refresh Request
 
    If the client wishes to immediately delete an existing allocation, it
@@ -2010,16 +2028,8 @@ Internet-Draft                    TURN                         July 2019
    ADDRESS-FAMILY attribute indicating the address family type that
    should be refreshed.  If no REQUESTED-ADDRESS-FAMILY is included then
    the request should be treated as applying to all current allocations.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 36]
-
-Internet-Draft                    TURN                         July 2019
-
-
-   The client MUST only include family type it previously allocated and
-   has not yet deleted.  This process can also be used to delete an
+   The client MUST only include the family type it previously allocated
+   and has not yet deleted.  This process can also be used to delete an
    allocation of a specific address type, by setting the lifetime of
    that refresh request to 0.  Deleting a single allocation destroys any
    permissions or channels associated with that particular allocation;
@@ -2055,6 +2065,15 @@ Internet-Draft                    TURN                         July 2019
 
    Subsequent processing depends on the "desired lifetime" value:
 
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 37]
+
+Internet-Draft                    TURN                         July 2019
+
+
    o  If the "desired lifetime" is 0, then the request succeeds and the
       allocation is deleted.
 
@@ -2064,15 +2083,6 @@ Internet-Draft                    TURN                         July 2019
 
    If the request succeeds, then the server sends a success response
    containing:
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 37]
-
-Internet-Draft                    TURN                         July 2019
-
 
    o  A LIFETIME attribute containing the current value of the time-to-
       expiry timer.
@@ -2112,6 +2122,14 @@ Internet-Draft                    TURN                         July 2019
    permission expires.  Within the context of an allocation, a
    permission is uniquely identified by its associated IP address.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 38]
+
+Internet-Draft                    TURN                         July 2019
+
+
    By sending either CreatePermission requests or ChannelBind requests,
    the client can cause the server to install or refresh a permission
    for a given IP address.  This causes one of two things to happen:
@@ -2122,13 +2140,6 @@ Internet-Draft                    TURN                         July 2019
 
    o  If a permission for that IP address already exists, then the time-
       to-expiry for that permission is reset to Permission Lifetime.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 38]
-
-Internet-Draft                    TURN                         July 2019
-
 
    The Permission Lifetime MUST be 300 seconds (= 5 minutes).
 
@@ -2163,6 +2174,18 @@ Internet-Draft                    TURN                         July 2019
       guidelines of ICE [RFC8445], and applications not using ICE are
       advised to do something similar.
 
+
+
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 39]
+
+Internet-Draft                    TURN                         July 2019
+
+
 10.  CreatePermission
 
    TURN supports two ways for the client to install or refresh
@@ -2176,15 +2199,6 @@ Internet-Draft                    TURN                         July 2019
 
    The client who wishes to install or refresh one or more permissions
    can send a CreatePermission request to the server.
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 39]
-
-Internet-Draft                    TURN                         July 2019
-
 
    When forming a CreatePermission request, the client MUST include at
    least one XOR-PEER-ADDRESS attribute, and MAY include more than one
@@ -2221,6 +2235,13 @@ Internet-Draft                    TURN                         July 2019
    XOR-PEER-ADDRESS attribute -- if a value is not allowed, the server
    rejects the request with a 403 (Forbidden) error.
 
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 40]
+
+Internet-Draft                    TURN                         July 2019
+
+
    If the message is valid and the server is capable of carrying out the
    request, then the server installs or refreshes a permission for the
    IP address contained in each XOR-PEER-ADDRESS attribute as described
@@ -2234,13 +2255,6 @@ Internet-Draft                    TURN                         July 2019
       idempotency of CreatePermission requests over UDP using the
       "stateless stack approach".  Retransmitted CreatePermission
       requests will simply refresh the permissions.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 40]
-
-Internet-Draft                    TURN                         July 2019
-
 
 10.3.  Receiving a CreatePermission Response
 
@@ -2274,6 +2288,16 @@ Internet-Draft                    TURN                         July 2019
    indication if it wishes the server to set the DF bit on the UDP
    datagram sent to the peer.
 
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 41]
+
+Internet-Draft                    TURN                         July 2019
+
+
 11.2.  Receiving a Send Indication
 
    When the server receives a Send indication, it processes as per
@@ -2290,13 +2314,6 @@ Internet-Draft                    TURN                         July 2019
    this attribute is present, then the server acts as if the DONT-
    FRAGMENT attribute is an unknown comprehension-required attribute
    (and thus the Send indication is discarded).
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 41]
-
-Internet-Draft                    TURN                         July 2019
-
 
    The server also checks that there is a permission installed for the
    IP address contained in the XOR-PEER-ADDRESS attribute.  If no such
@@ -2329,6 +2346,14 @@ Internet-Draft                    TURN                         July 2019
    When the server receives a UDP datagram at a currently allocated
    relayed transport address, the server looks up the allocation
    associated with the relayed transport address.  The server then
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 42]
+
+Internet-Draft                    TURN                         July 2019
+
+
    checks to see whether the set of permissions for the allocation allow
    the relaying of the UDP datagram as described in Section 9.
 
@@ -2344,15 +2369,6 @@ Internet-Draft                    TURN                         July 2019
    datagram, and the XOR-PEER-ADDRESS attribute is set to the source
    transport address of the received UDP datagram.  The Data indication
    is then sent on the 5-tuple associated with the allocation.
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 42]
-
-Internet-Draft                    TURN                         July 2019
-
 
 11.4.  Receiving a Data Indication
 
@@ -2386,8 +2402,16 @@ Internet-Draft                    TURN                         July 2019
    or 3 for an ICMPv6 [RFC4443] packet.  It also verifies that the IP
    packet in the ICMP packet payload contains a UDP header, and if a UDP
    header is present, the server extracts the UDP source and destination
-   port information.  If either of these conditions fail, then the ICMP
-   packet is silently dropped.
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 43]
+
+Internet-Draft                    TURN                         July 2019
+
+
+   IP address and port information.  If either of these conditions fail,
+   then the ICMP packet is silently dropped.
 
    The server looks up the allocation whose relayed transport address
    corresponds to the encapsulated packet's source IP address and UDP
@@ -2403,13 +2427,6 @@ Internet-Draft                    TURN                         July 2019
    discards the ICMP packet.  Note that only addresses are compared and
    port numbers are not considered.
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 43]
-
-Internet-Draft                    TURN                         July 2019
-
-
    If relaying is permitted then the server forms and sends a Data
    indication.  The Data indication MUST contain both an XOR-PEER-
    ADDRESS and an ICMP attribute.  The ICMP attribute is set to the
@@ -2424,6 +2441,13 @@ Internet-Draft                    TURN                         July 2019
    otherwise the port portion is set to 0.  The Data indication is then
    sent on the 5-tuple associated with the allocation.
 
+   Implementation Note: New ICMP types or codes can be defined in future
+   specifications.  If the server receives an ICMP error packet, and the
+   new type or code field can help the client to make use of the ICMP
+   error notification and generate feedback to the application layer,
+   the server sends the Data indication with an ICMP attribute conveying
+   the new ICMP type or code.
+
 11.6.  Receiving a Data Indication with an ICMP attribute
 
    When the client receives a Data indication with an ICMP attribute, it
@@ -2432,6 +2456,15 @@ Internet-Draft                    TURN                         July 2019
    SHOULD also check that the XOR-PEER-ADDRESS attribute value contains
    an IP address with an active permission, and discard the Data
    indication otherwise.
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 44]
+
+Internet-Draft                    TURN                         July 2019
+
 
    If the Data indication passes the above checks, the client signals
    the application of the error condition, along with an indication that
@@ -2459,13 +2492,6 @@ Internet-Draft                    TURN                         July 2019
       0x5000-0xFFFF: Reserved (For DTLS-SRTP multiplexing collision
       avoidance, see [RFC7983].
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 44]
-
-Internet-Draft                    TURN                         July 2019
-
-
    Note that the channel number range is not backwards compatible with
    [RFC5766], and cannot be used in environments where such
    compatibility is required.
@@ -2473,6 +2499,28 @@ Internet-Draft                    TURN                         July 2019
    According to [RFC7983], ChannelData messages can be distinguished
    from other multiplexed protocols by examining the first byte of the
    message:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 45]
+
+Internet-Draft                    TURN                         July 2019
+
 
    +------------+------------------------------+
    | [0..3]     | STUN                         |
@@ -2515,18 +2563,20 @@ Internet-Draft                    TURN                         July 2019
 
    A channel binding consists of:
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 45]
-
-Internet-Draft                    TURN                         July 2019
-
-
    o  a channel number;
 
    o  a transport address (of the peer); and
 
    o  A time-to-expiry timer.
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 46]
+
+Internet-Draft                    TURN                         July 2019
+
 
    Within the context of an allocation, a channel binding is uniquely
    identified either by the channel number or by the peer's transport
@@ -2570,19 +2620,19 @@ Internet-Draft                    TURN                         July 2019
 
    To initiate the ChannelBind transaction, the client forms a
    ChannelBind request.  The channel to be bound is specified in a
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 46]
-
-Internet-Draft                    TURN                         July 2019
-
-
    CHANNEL-NUMBER attribute, and the peer's transport address is
    specified in an XOR-PEER-ADDRESS attribute.  Section 12.2 describes
    the restrictions on these attributes.  The client MUST only include
    an XOR-PEER-ADDRESS attribute with an address of the same address
    family as that of a relayed transport address for the allocation.
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 47]
+
+Internet-Draft                    TURN                         July 2019
+
 
    Rebinding a channel to the same transport address that it is already
    bound to provides a way to refresh a channel binding and the
@@ -2609,14 +2659,12 @@ Internet-Draft                    TURN                         July 2019
    o  The transport address is not currently bound to a different
       channel number.
 
-   o  If the XOR-PEER-ADDRESS attribute contains an address of an
-      address family that is not the same as that of a relayed transport
-      address for the allocation, the server MUST generate an error
-      response with the 443 (Peer Address Family Mismatch) response
-      code.
-
    If any of these tests fail, the server replies with a 400 (Bad
-   Request) error.
+   Request) error.  If the XOR-PEER-ADDRESS attribute contains an
+   address of an address family that is not the same as that of a
+   relayed transport address for the allocation, the server MUST
+   generate an error response with the 443 (Peer Address Family
+   Mismatch) response code.
 
    The server MAY impose restrictions on the IP address and port values
    allowed in the XOR-PEER-ADDRESS attribute -- if a value is not
@@ -2626,14 +2674,6 @@ Internet-Draft                    TURN                         July 2019
    request due to some capacity limit or similar, the server replies
    with a 508 (Insufficient Capacity) error.
 
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 47]
-
-Internet-Draft                    TURN                         July 2019
-
-
    Otherwise, the server replies with a ChannelBind success response.
    There are no required attributes in a successful ChannelBind
    response.
@@ -2642,6 +2682,14 @@ Internet-Draft                    TURN                         July 2019
    refreshes the channel binding using the channel number in the
    CHANNEL-NUMBER attribute and the transport address in the XOR-PEER-
    ADDRESS attribute.  The server also installs or refreshes a
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 48]
+
+Internet-Draft                    TURN                         July 2019
+
+
    permission for the IP address in the XOR-PEER-ADDRESS attribute as
    described in Section 9.
 
@@ -2672,24 +2720,6 @@ Internet-Draft                    TURN                         July 2019
    The ChannelData message is used to carry application data between the
    client and the server.  It has the following format:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 48]
-
-Internet-Draft                    TURN                         July 2019
-
-
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2706,6 +2736,15 @@ Internet-Draft                    TURN                         July 2019
    The Channel Number field specifies the number of the channel on which
    the data is traveling, and thus the address of the peer that is
    sending or is to receive the data.
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 49]
+
+Internet-Draft                    TURN                         July 2019
+
 
    The Length field specifies the length in bytes of the application
    data field (i.e., it does not include the size of the ChannelData
@@ -2737,15 +2776,6 @@ Internet-Draft                    TURN                         July 2019
    multiple of 4 (See section 14 in [I-D.ietf-tram-stunbis]).  Over UDP,
    the padding is not required but MAY be included.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 49]
-
-Internet-Draft                    TURN                         July 2019
-
-
    The ChannelData message is then sent on the 5-tuple associated with
    the allocation.
 
@@ -2761,6 +2791,16 @@ Internet-Draft                    TURN                         July 2019
    ChannelData message (i.e., the UDP header length field value is less
    than the ChannelData header length field value + 4 + 8), then the
    message is silently discarded.
+
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 50]
+
+Internet-Draft                    TURN                         July 2019
+
 
    If the ChannelData message is received over TCP or over TLS-over-TCP,
    then the actual length of the ChannelData message is as described in
@@ -2791,16 +2831,7 @@ Internet-Draft                    TURN                         July 2019
    The resulting UDP datagram is then sent to the peer.  Note that if
    the Length field in the ChannelData message is 0, then there will be
    no data in the UDP datagram, but the UDP datagram is still formed and
-   sent.
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 50]
-
-Internet-Draft                    TURN                         July 2019
-
+   sent (Section 4.1 in [RFC6263]).
 
 12.7.  Relaying Data from the Peer
 
@@ -2818,6 +2849,15 @@ Internet-Draft                    TURN                         July 2019
 
    This section addresses IPv4-to-IPv6, IPv6-to-IPv4, and IPv6-to-IPv6
    translations.  Requirements for translation of the IP addresses and
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 51]
+
+Internet-Draft                    TURN                         July 2019
+
+
    port numbers of the packets are described above.  The following
    sections specify how to translate other header fields.
 
@@ -2829,12 +2869,12 @@ Internet-Draft                    TURN                         July 2019
 
    The descriptions below have two parts: a preferred behavior and an
    alternate behavior.  The server SHOULD implement the preferred
-   behavior.  Otherwise, if that is not possible for a particular field,
-   the server MUST implement the alternate behavior and MUST NOT do
-   anything else for the reasons detailed in [RFC7915].  The TURN server
-   solely relies on the DF bit in the IPv4 header and Fragmentation
-   header in IPv6 header to handle fragmentation and does not rely on
-   the DONT-FRAGMENT attribute.
+   behavior, but if that is not possible for a particular field, the
+   server MUST implement the alternate behavior and MUST NOT do anything
+   else for the reasons detailed in [RFC7915].  The TURN server solely
+   relies on the DF bit in the IPv4 header and Fragmentation header in
+   IPv6 header to handle fragmentation and does not rely on the DONT-
+   FRAGMENT attribute.
 
 13.1.  IPv4-to-IPv6 Translations
 
@@ -2848,15 +2888,6 @@ Internet-Draft                    TURN                         July 2019
    Traffic Class
 
       Preferred behavior: As specified in Section 4 of [RFC7915].
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 51]
-
-Internet-Draft                    TURN                         July 2019
-
 
       Alternate behavior: The TURN server sets the Traffic Class to the
       default value for outgoing packets.
@@ -2874,6 +2905,14 @@ Internet-Draft                    TURN                         July 2019
       default value of zero for outgoing packets.
 
    Hop Limit
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 52]
+
+Internet-Draft                    TURN                         July 2019
+
 
       Preferred behavior: As specified in Section 4 of [RFC7915].
 
@@ -2907,13 +2946,6 @@ Internet-Draft                    TURN                         July 2019
    IPv6 flows.  Therefore, the Flow label [RFC6437] SHOULD NOT be copied
    as part of the translation.
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 52]
-
-Internet-Draft                    TURN                         July 2019
-
-
       Preferred behavior: The TURN server can use the 5-tuple of relayed
       transport address, peer transport address and UDP protocol number
       to identify each flow, generate and set the flow label value in
@@ -2929,6 +2961,14 @@ Internet-Draft                    TURN                         July 2019
       Preferred behavior: The TURN server acts as a regular router with
       respect to decrementing the Hop Limit and generating an ICMPv6
       error if it reaches zero.
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 53]
+
+Internet-Draft                    TURN                         July 2019
+
 
       Alternate behavior: The TURN server sets the Hop Limit to the
       default value for outgoing packets.
@@ -2961,15 +3001,6 @@ Internet-Draft                    TURN                         July 2019
       bytes.  The TURN server sets the fields of the Fragment header as
       appropriate for a packet originating from the server.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 53]
-
-Internet-Draft                    TURN                         July 2019
-
-
       Alternate behavior: The TURN server assembles incoming fragments.
       The TURN server follows its default behavior to send outgoing
       packets.
@@ -2984,6 +3015,16 @@ Internet-Draft                    TURN                         July 2019
       Fragmentation header as described above.
 
       Alternate behavior: Same as preferred.
+
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 54]
+
+Internet-Draft                    TURN                         July 2019
+
 
 13.3.  IPv6-to-IPv4 Translations
 
@@ -3019,13 +3060,6 @@ Internet-Draft                    TURN                         July 2019
       For both preferred and alternate behavior, the DONT-FRAGMENT
       attribute MUST be ignored by the server.
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 54]
-
-Internet-Draft                    TURN                         July 2019
-
-
 14.  UDP-to-UDP relay
 
    This section describes how the server sets various fields in the IP
@@ -3040,6 +3074,13 @@ Internet-Draft                    TURN                         July 2019
    alternate behavior.  The server SHOULD implement the preferred
    behavior, but if that is not possible for a particular field, then it
    SHOULD implement the alternative behavior.
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 55]
+
+Internet-Draft                    TURN                         July 2019
+
 
    Differentiated Services Code Point (DSCP) field [RFC2474]
 
@@ -3074,14 +3115,6 @@ Internet-Draft                    TURN                         July 2019
       attribute, then set the outgoing UDP packet to not fragment.  In
       all other cases when sending an outgoing packet containing
       application data (e.g., Data indication, ChannelData message, or
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 55]
-
-Internet-Draft                    TURN                         July 2019
-
-
       DONT-FRAGMENT attribute not included in the Send indication), copy
       the DF bit from the DF bit of the incoming packet that contained
       the application data.
@@ -3096,6 +3129,13 @@ Internet-Draft                    TURN                         July 2019
       In both the Preferred and Alternate Behaviors, the resulting
       packet may be too large for the outgoing link.  If this is the
       case, then the normal fragmentation rules apply [RFC1122].
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 56]
+
+Internet-Draft                    TURN                         July 2019
 
 
    IPv4 Options
@@ -3113,30 +3153,23 @@ Internet-Draft                    TURN                         July 2019
    datagram to the peer.  Note that the server does not perform per-
    packet translation for TCP-to-UDP relaying.
 
-   TCP multi-path [RFC6824] is not supported by this version of TURN
-   because TCP multi-path is not used by both SIP and WebRTC protocols
-   [RFC7478] for media and non-media data.  TCP connection between the
-   TURN client and server can use TCP-AO [RFC5925] but UDP does not
-   provide a similar type of authentication until UDP supports a similar
-   authentication option [I-D.ietf-tsvwg-udp-options].  Even if both
-   TCP-AO and UDP authentication would be used between TURN client and
-   server, it would not change the end-to-end security properties of the
-   application payload being relayed.  Therefore applications using TURN
-   will need to secure their application data end-to-end appropriately,
-   e.g., SRTP for RTP applications.  Note that TCP-AO option obsoletes
-   TCP MD5 option.  Unlike UDP, TCP without the TCP Fast Open extension
+   Multipath TCP [I-D.ietf-mptcp-rfc6824bis] is not supported by this
+   version of TURN because TCP multi-path is not used by both SIP and
+   WebRTC protocols [RFC7478] for media and non-media data.  TCP
+   connection between the TURN client and server can use TCP-AO
+   [RFC5925] but UDP does not provide a similar type of authentication
+   until UDP supports a similar authentication option
+   [I-D.ietf-tsvwg-udp-options].  Even if both TCP-AO and UDP
+   authentication would be used between TURN client and server, it would
+   not change the end-to-end security properties of the application
+   payload being relayed.  Therefore applications using TURN will need
+   to secure their application data end-to-end appropriately, e.g., SRTP
+   for RTP applications.  Note that TCP-AO option obsoletes TCP MD5
+   option.  Unlike UDP, TCP without the TCP Fast Open extension
    [RFC7413] does not support 0-RTT session resumption.  The TCP user
    timeout [RFC5482] equivalent for application data relayed by the TURN
    is the use of RTP control protocol (RTCP).  As a reminder, RTCP is a
    fundamental and integral part of RTP.
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 56]
-
-Internet-Draft                    TURN                         July 2019
-
 
    The descriptions below have two parts: a preferred behavior and an
    alternate behavior.  The server SHOULD implement the preferred
@@ -3153,6 +3186,14 @@ Internet-Draft                    TURN                         July 2019
       code point so inter flow differentiation is not possible, see
       Section 5.1 of [RFC7657].  The server sets the outgoing value to
       the DSCP code point used by the TCP connection, unless the server
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 57]
+
+Internet-Draft                    TURN                         July 2019
+
+
       includes a differentiated services classifier and marker
       [RFC2474].
 
@@ -3186,14 +3227,6 @@ Internet-Draft                    TURN                         July 2019
 
       Alternate Behavior: Same as preferred.
 
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 57]
-
-Internet-Draft                    TURN                         July 2019
-
-
    IPv6 Fragmentation fields
 
       Preferred Behavior: If the TCP traffic arrives over IPv6, the
@@ -3209,6 +3242,13 @@ Internet-Draft                    TURN                         July 2019
       for IPv4 options.
 
       Alternate Behavior: Same as preferred.
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 58]
+
+Internet-Draft                    TURN                         July 2019
+
 
 16.  UDP-to-TCP relay
 
@@ -3242,14 +3282,6 @@ Internet-Draft                    TURN                         July 2019
       Preferred Behavior: Ignore, ECN signals are dropped in the TURN
       server for the incoming UDP datagrams from the peer.
 
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 58]
-
-Internet-Draft                    TURN                         July 2019
-
-
       Alternate Behavior: Same as preferred.
 
 
@@ -3266,6 +3298,13 @@ Internet-Draft                    TURN                         July 2019
 
 
    Extension Headers
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 59]
+
+Internet-Draft                    TURN                         July 2019
+
 
       Preferred behavior: The outgoing packet uses the system defaults
       for IPv6 extension headers.
@@ -3295,17 +3334,6 @@ Internet-Draft                    TURN                         July 2019
 
 18.  STUN Attributes
 
-
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 59]
-
-Internet-Draft                    TURN                         July 2019
-
-
    This STUN extension defines the following attributes:
 
      0x000C: CHANNEL-NUMBER
@@ -3326,6 +3354,14 @@ Internet-Draft                    TURN                         July 2019
 
    Some of these attributes have lengths that are not multiples of 4.
    By the rules of STUN, any attribute whose length is not a multiple of
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 60]
+
+Internet-Draft                    TURN                         July 2019
+
+
    4 bytes MUST be immediately followed by 1 to 3 padding bytes to
    ensure the next attribute (if any) would start on a 4-byte boundary
    (see [I-D.ietf-tram-stunbis]).
@@ -3353,15 +3389,6 @@ Internet-Draft                    TURN                         July 2019
    attribute is 4-bytes long and consists of a 32-bit unsigned integral
    value representing the number of seconds remaining until expiration.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 60]
-
-Internet-Draft                    TURN                         July 2019
-
-
 18.3.  XOR-PEER-ADDRESS
 
    The XOR-PEER-ADDRESS specifies the address and port of the peer as
@@ -3371,14 +3398,25 @@ Internet-Draft                    TURN                         July 2019
 
 18.4.  DATA
 
-   The DATA attribute is present in all Send and Data indications.  The
-   value portion of this attribute is variable length and consists of
-   the application data (that is, the data that would immediately follow
-   the UDP header if the data was been sent directly between the client
-   and the peer).  The application data is equivalent to the "UDP user
-   data" and does not include the "surplus area" defined in Section 4 of
-   [I-D.ietf-tsvwg-udp-options].  If the length of this attribute is not
-   a multiple of 4, then padding must be added after this attribute.
+   The DATA attribute is present in all Send indications.  If the ICMP
+   attribute is not present in a Data indication, it contains a DATA
+   attribute.  The value portion of this attribute is variable length
+   and consists of the application data (that is, the data that would
+   immediately follow the UDP header if the data was been sent directly
+   between the client and the peer).  The application data is equivalent
+   to the "UDP user data" and does not include the "surplus area"
+   defined in Section 4 of [I-D.ietf-tsvwg-udp-options].  If the length
+   of this attribute is not a multiple of 4, then padding must be added
+   after this attribute.
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 61]
+
+Internet-Draft                    TURN                         July 2019
+
 
 18.5.  XOR-RELAYED-ADDRESS
 
@@ -3406,18 +3444,6 @@ Internet-Draft                    TURN                         July 2019
    Reserved:  at this point, the 24 bits in the Reserved field MUST be
       set to zero by the client and MUST be ignored by the server.
 
-
-
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 61]
-
-Internet-Draft                    TURN                         July 2019
-
-
 18.7.  EVEN-PORT
 
    This attribute allows the client to request that the port in the
@@ -3439,8 +3465,17 @@ Internet-Draft                    TURN                         July 2019
 
    RFFU:  Reserved For Future Use.
 
-   The other 7 bits of the attribute's value must be set to zero on
-   transmission and ignored on reception.
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 62]
+
+Internet-Draft                    TURN                         July 2019
+
+
+   The RFFU field must be set to zero on transmission and ignored on
+   reception.
 
    Since the length of this attribute is not a multiple of 4, padding
    must immediately follow this attribute.
@@ -3466,14 +3501,6 @@ Internet-Draft                    TURN                         July 2019
    The RFFU field MUST be set to zero on transmission and MUST be
    ignored on reception.  It is reserved for future uses.
 
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 62]
-
-Internet-Draft                    TURN                         July 2019
-
-
 18.9.  DONT-FRAGMENT
 
    This attribute is used by the client to request that the server set
@@ -3493,6 +3520,16 @@ Internet-Draft                    TURN                         July 2019
 
    The attribute value is 8 bytes and contains the token value.
 
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 63]
+
+Internet-Draft                    TURN                         July 2019
+
+
 18.11.  ADDITIONAL-ADDRESS-FAMILY
 
    This attribute is used by clients to request the allocation of a IPv4
@@ -3502,7 +3539,7 @@ Internet-Draft                    TURN                         July 2019
    value of 0x02 (IPv6 address) is the only valid value in Allocate
    request.
 
-18.12.  ADDRESS-ERROR-CODE Attribute
+18.12.  ADDRESS-ERROR-CODE
 
    This attribute is used by servers to signal the reason for not
    allocating the requested address family.  The value portion of this
@@ -3521,17 +3558,8 @@ Internet-Draft                    TURN                         July 2019
       [I-D.ietf-tram-stunbis], Section 14.1: 0x01 for IPv4 addresses and
       0x02 for IPv6 addresses.
 
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 63]
-
-Internet-Draft                    TURN                         July 2019
-
-
    Reserved:  at this point, the 13 bits in the Reserved field MUST be
-      set to zero by the client and MUST be ignored by the server.
+      set to zero by the server and MUST be ignored by the client.
 
    Class:  The Class represents the hundreds digit of the error code and
       is defined in section 14.8 of [I-D.ietf-tram-stunbis].
@@ -3548,7 +3576,17 @@ Internet-Draft                    TURN                         July 2019
       (which can be as long as 509 bytes when encoding them or 763 bytes
       when decoding them).
 
-18.13.  ICMP Attribute
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 64]
+
+Internet-Draft                    TURN                         July 2019
+
+
+18.13.  ICMP
 
    This attribute is used by servers to signal the reason an UDP packet
    was dropped.  The following is the format of the ICMP attribute.
@@ -3577,15 +3615,6 @@ Internet-Draft                    TURN                         July 2019
       Unreachable) and Code is 4 (fragmentation needed and DF set), the
       Error Data field will be set to the Maximum Transmission Unit of
       the next-hop link (Section 3.2 of [RFC4443]) and Section 4 of
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 64]
-
-Internet-Draft                    TURN                         July 2019
-
-
       [RFC1191]).  For other ICMPv6 types and ICMPv4 types and codes,
       Error Data field MUST be set to zero.
 
@@ -3603,6 +3632,15 @@ Internet-Draft                    TURN                         July 2019
 
    440  (Address Family not Supported): The server does not support the
       address family requested by the client.
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 65]
+
+Internet-Draft                    TURN                         July 2019
+
 
    441  (Wrong Credentials): The credentials in the (non-Allocate)
       request do not match those used to create the allocation.
@@ -3634,21 +3672,13 @@ Internet-Draft                    TURN                         July 2019
 
    For each message, the attributes included in the message and their
    values are shown.  For convenience, values are shown in a human-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 65]
-
-Internet-Draft                    TURN                         July 2019
-
-
    readable format rather than showing the actual octets; for example,
    "XOR-RELAYED-ADDRESS=192.0.2.15:9000" shows that the XOR-RELAYED-
    ADDRESS attribute is included with an address of 192.0.2.15 and a
    port of 9000, here the address and port are shown before the xor-ing
    is done.  For attributes with string-like values (e.g.,
    SOFTWARE="Example client, version 1.03" and
-   NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"), the value of the attribute
+   NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"), the value of the attribute
    is shown in quotes for readability, but these quotes do not appear in
    the actual value.
 
@@ -3663,37 +3693,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 66]
+Reddy, et al.           Expires January 17, 2020               [Page 66]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -3736,7 +3736,7 @@ Internet-Draft                    TURN                         July 2019
     |    LIFETIME=1200 (20 minutes)      |             |             |
     |    XOR-RELAYED-ADDRESS=192.0.2.15:50000          |             |
     |    XOR-MAPPED-ADDRESS=192.0.2.1:7000             |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 
    The client begins by selecting a host transport address to use for
    the TURN session; in this example, the client has selected
@@ -3749,7 +3749,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 67]
+Reddy, et al.           Expires January 17, 2020               [Page 67]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -3801,24 +3801,23 @@ Internet-Draft                    TURN                         July 2019
    is configured to use the username "George" for the realm
    "example.com".  The client includes the PASSWORD-ALGORITHM attribute
    indicating the algorithm that the server must use to derive the long-
-   term password.  The client also includes the REALM and NONCE
+   term password.  The client also includes the REALM, PASSWORD-
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 68]
+Reddy, et al.           Expires January 17, 2020               [Page 68]
 
 Internet-Draft                    TURN                         July 2019
 
 
-   attributes, which are just copied from the 401 error response.
-   Finally, the client includes MESSAGE-INTEGRITY and MESSAGE-INTEGRITY-
-   SHA256 attributes as the last attributes in the message, whose values
-   are Hashed Message Authentication Code - Secure Hash Algorithm 1
-   (HMAC-SHA1) hash and Hashed Message Authentication Code - Secure Hash
-   Algorithm 2 (HMAC-SHA2) hash over the contents of the message (shown
-   as just "..." above); this HMAC-SHA1 and HMAC-SHA2 computation
-   includes a password value.  Thus, an attacker cannot compute the
-   message integrity value without somehow knowing the secret password.
+   ALGORITHMS and NONCE attributes, which are just copied from the 401
+   error response.  Finally, the client includes MESSAGE-INTEGRITY-
+   SHA256 attribute as the last attributes in the message, whose value
+   is Hashed Message Authentication Code - Secure Hash Algorithm 2
+   (HMAC-SHA2) hash over the contents of the message (shown as just
+   "..." above); this HMAC-SHA2 computation includes a password value.
+   Thus, an attacker cannot compute the message integrity value without
+   somehow knowing the secret password.
 
    The server, upon receipt of the authenticated Allocate request,
    checks that everything is OK, then creates an allocation.  The server
@@ -3831,11 +3830,10 @@ Internet-Draft                    TURN                         July 2019
    allocation.  The server includes an XOR-MAPPED-ADDRESS attribute
    whose value is the server-reflexive address of the client; this value
    is not used otherwise in TURN but is returned as a convenience to the
-   client.  The server includes either a MESSAGE-INTEGRITY or MESSAGE-
-   INTEGRITY-SHA256 attribute to authenticate the response and to ensure
-   its integrity; note that the response does not contain the USERNAME,
-   REALM, and NONCE attributes.  The server also includes a SOFTWARE
-   attribute.
+   client.  The server includes a MESSAGE-INTEGRITY-SHA256 attribute to
+   authenticate the response and to ensure its integrity; note that the
+   response does not contain the USERNAME, REALM, and NONCE attributes.
+   The server also includes a SOFTWARE attribute.
 
   TURN                                 TURN           Peer          Peer
   client                               server          A             B
@@ -3845,11 +3843,13 @@ Internet-Draft                    TURN                         July 2019
     |    USERNAME="George"               |             |             |
     |    REALM="example.com"             |             |             |
     |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+    |    PASSWORD-ALGORITHM=SHA256       |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
     |                                    |             |             |
     |<-- CreatePermission success resp.--|             |             |
     |    Transaction-Id=0xE5913A8F460956CA277D3319     |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 
    The client then creates a permission towards Peer A in preparation
    for sending it some application data.  This is done through a
@@ -3861,7 +3861,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 69]
+Reddy, et al.           Expires January 17, 2020               [Page 69]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -3875,9 +3875,9 @@ Internet-Draft                    TURN                         July 2019
    corresponding permission, and then replies with a CreatePermission
    success response.  Like the client, the server chooses not to include
    the SOFTWARE attribute in its reply.  Again, note how success
-   responses contain a MESSAGE-INTEGRITY or MESSAGE-INTEGRITY-SHA256
-   attribute (assuming the server uses the long-term credential
-   mechanism), but no USERNAME, REALM, and NONCE attributes.
+   responses contains a MESSAGE-INTEGRITY-SHA256 attribute (assuming the
+   server uses the long-term credential mechanism), but no USERNAME,
+   REALM, and NONCE attributes.
 
   TURN                                 TURN           Peer          Peer
   client                               server          A             B
@@ -3917,7 +3917,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 70]
+Reddy, et al.           Expires January 17, 2020               [Page 70]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -3941,11 +3941,13 @@ Internet-Draft                    TURN                         July 2019
     |    USERNAME="George"               |             |             |
     |    REALM="example.com"             |             |             |
     |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+    |    PASSWORD-ALGORITHM=SHA256       |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
     |                                    |             |             |
     |<-- ChannelBind success response ---|             |             |
     |    Transaction-Id=0x6490D3BC175AFF3D84513212     |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 
    The client now binds a channel to Peer B, specifying a free channel
    number (0x4000) in the CHANNEL-NUMBER attribute, and Peer B's
@@ -3971,9 +3973,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 71]
+Reddy, et al.           Expires January 17, 2020               [Page 71]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4009,11 +4009,13 @@ Internet-Draft                    TURN                         July 2019
     |    USERNAME="George"               |             |             |
     |    REALM="example.com"             |             |             |
     |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+    |    PASSWORD-ALGORITHM=SHA256       |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
     |                                    |             |             |
     |<-- ChannelBind success response ---|             |             |
     |    Transaction-Id=0xE5913A8F46091637EF7D3328     |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 
    The channel binding lasts for 10 minutes unless refreshed.  The TURN
    client refreshes the binding by sending ChannelBind request rebinding
@@ -4027,9 +4029,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 72]
+Reddy, et al.           Expires January 17, 2020               [Page 72]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4042,7 +4042,9 @@ Internet-Draft                    TURN                         July 2019
     |    USERNAME="George"               |             |             |
     |    REALM="example.com"             |             |             |
     |    NONCE="oobMatJos2gAAAadl7W7PeDU4hKE72jda"     |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+    |    PASSWORD-ALGORITHM=SHA256       |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
     |                                    |             |             |
     |<-- Refresh error response ---------|             |             |
     |    Transaction-Id=0x0864B3C27ADE9354B4312414     |             |
@@ -4060,7 +4062,7 @@ Internet-Draft                    TURN                         July 2019
     |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
     |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
     |    PASSWORD-ALGORITHM=SHA256       |             |             |
-    |    MESSAGE-INTEGRITY=...           |             |             |
+    |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
     |                                    |             |             |
     |<-- Refresh success response -------|             |             |
     |    Transaction-Id=0x427BD3E625A85FC731DC4191     |             |
@@ -4079,16 +4081,17 @@ Internet-Draft                    TURN                         July 2019
    value.  This second attempt is accepted, and the server replies with
    a success response.  Note that the client did not include a LIFETIME
    attribute in the request, so the server refreshes the allocation for
-   the default lifetime of 10 minutes (as can be seen by the LIFETIME
-   attribute in the success response).
 
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 73]
+Reddy, et al.           Expires January 17, 2020               [Page 73]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   the default lifetime of 10 minutes (as can be seen by the LIFETIME
+   attribute in the success response).
 
 21.  Security Considerations
 
@@ -4135,17 +4138,16 @@ Internet-Draft                    TURN                         July 2019
    a message exchange between a client and server can determine the
    password by trying a number of candidate passwords and seeing if one
    of them is correct.  This attack works when the passwords are low
-   entropy, such as a word from the dictionary.  This attack can be
-   mitigated by using strong passwords with large entropy.  In
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 74]
+Reddy, et al.           Expires January 17, 2020               [Page 74]
 
 Internet-Draft                    TURN                         July 2019
 
 
+   entropy, such as a word from the dictionary.  This attack can be
+   mitigated by using strong passwords with large entropy.  In
    situations where even stronger mitigation is required, (D)TLS
    transport between the client and the server can be used.
 
@@ -4172,7 +4174,7 @@ Internet-Draft                    TURN                         July 2019
    generally present in IP-based communications and is not substantially
    worsened by TURN.  Consider a normal, non-TURN IP session between
    hosts A and B.  An attacker can send packets to B as if they came
-   from A by sending packets towards A with a spoofed IP address of B.
+   from A by sending packets towards B with a spoofed IP address of A.
    This attack requires the attacker to know the IP addresses of A and
    B.  With TURN, an attacker wishing to send packets towards a client
    using a Data indication needs to know its IP address (and port), the
@@ -4192,16 +4194,16 @@ Internet-Draft                    TURN                         July 2019
    directly send.  This can happen, for example, if the server is
    located behind a firewall that allows packets from outside the
    firewall to be delivered to the server, but not to other hosts behind
-   the firewall.  In these situations, an attacker could send the server
-   a Send indication with an XOR-PEER-ADDRESS attribute containing the
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 75]
+Reddy, et al.           Expires January 17, 2020               [Page 75]
 
 Internet-Draft                    TURN                         July 2019
 
 
+   the firewall.  In these situations, an attacker could send the server
+   a Send indication with an XOR-PEER-ADDRESS attribute containing the
    transport address of one of the other hosts behind the firewall.  If
    the server was to allow relaying of traffic to arbitrary peers, then
    this would provide a way for the attacker to attack arbitrary hosts
@@ -4239,10 +4241,10 @@ Internet-Draft                    TURN                         July 2019
    username does not reveal the real user's identity, the USERNAME
    attribute carries an ephemeral and unique key identifier.  If the
    TURN client and server use the STUN long-term credential mechanism
-   and the username reveals the real user's identity, the client needs
-   to use (D)TLS transport between the client and the server or use the
-   USERHASH attribute instead of the USERNAME attribute to anonynmize
-   the username.
+   and the username reveals the real user's identity, the client MUST
+   either use the USERHASH attribute instead of the USERNAME attribute
+   to anonynmize the username or use (D)TLS transport between the client
+   and the server.
 
    If the TURN client and server use the STUN long-term credential
    mechanism and realm information is privacy sensitive, TURN can be run
@@ -4251,18 +4253,20 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 76]
+Reddy, et al.           Expires January 17, 2020               [Page 76]
 
 Internet-Draft                    TURN                         July 2019
 
 
-   SOFTWARE attribute can reveal the specific software version of the
-   TURN client and server to eavesdropper and it might possibly allow
-   attacks against vulnerable software that is known to contain security
-   holes.  If it is important to prevent an eavesdropper from learning
-   the software version, TURN can be run over (D)TLS.
+   The SOFTWARE attribute can reveal the specific software version of
+   the TURN client and server to eavesdropper and it might possibly
+   allow attacks against vulnerable software that is known to contain
+   security vulnerabilities.  If the software version is known to
+   contain security vulnerabilities, TURN SHOULD be run over (D)TLS to
+   prevent leaking the SOFTWARE attribute in clear text.  If zero-day
+   vulnerabilities are detected in the software version, the endpoint
+   policy can be modified to mandate the use of (D)TLS till the patch is
+   in place to fix the flaw.
 
    TURN concerns itself primarily with authentication and message
    integrity.  Confidentiality is only a secondary concern, as TURN
@@ -4301,19 +4305,20 @@ Internet-Draft                    TURN                         July 2019
 
    The result is a data packet that loops from the relayed transport
    address on server A to the relayed transport address on server B,
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 77]
+
+Internet-Draft                    TURN                         July 2019
+
+
    then from server B's transport address to server A's transport
    address, and then around the loop again.
 
    This attack is mitigated as follows.  By requiring all requests to be
    authenticated and/or by randomizing the port number allocated for the
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 77]
-
-Internet-Draft                    TURN                         July 2019
-
-
    relayed transport address, the server forces the attacker to either
    intercept or view responses sent to a third party (in this case, the
    other server) so that the attacker can authenticate the requests and
@@ -4357,18 +4362,16 @@ Internet-Draft                    TURN                         July 2019
    can also be configured with address- and port-dependent filtering, or
    can be configured to disallow inbound traffic entirely.  In these
    cases, if a client is allowed to connect the TURN server,
-   communications to the client will be less restrictive than what the
-   firewall would normally allow.
 
 
 
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 78]
+Reddy, et al.           Expires January 17, 2020               [Page 78]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   communications to the client will be less restrictive than what the
+   firewall would normally allow.
 
 21.2.1.  Faked Permissions
 
@@ -4413,19 +4416,21 @@ Internet-Draft                    TURN                         July 2019
    attacks cannot be prevented by cryptographic means but need to be
    considered in the design of the protocol.
 
+
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 79]
+
+Internet-Draft                    TURN                         July 2019
+
+
 21.3.1.  DoS against TURN Server
 
    A client wishing to disrupt service to other clients might obtain an
    allocation and then flood it with traffic, in an attempt to swamp the
    server and prevent it from servicing other legitimate clients.  This
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 79]
-
-Internet-Draft                    TURN                         July 2019
-
-
    is mitigated by the recommendation that the server limit the amount
    of bandwidth it will relay for a given username.  This won't prevent
    a client from sending a large amount of traffic, but it allows the
@@ -4470,17 +4475,17 @@ Internet-Draft                    TURN                         July 2019
    times between a TURN server and a tunnel between IPv4 and IPv6.  The
    attack goes as follows.
 
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 80]
+
+Internet-Draft                    TURN                         July 2019
+
+
    Suppose an attacker knows that a tunnel endpoint will forward
    encapsulated packets from a given IPv6 address (this doesn't
    necessarily need to be the tunnel endpoint's address).  Suppose he
    then spoofs two packets from this address:
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 80]
-
-Internet-Draft                    TURN                         July 2019
-
 
    1.  An Allocate request asking for a v4 address, and
 
@@ -4528,12 +4533,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 81]
+Reddy, et al.           Expires January 17, 2020               [Page 81]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4589,7 +4589,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 82]
+Reddy, et al.           Expires January 17, 2020               [Page 82]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4645,7 +4645,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 83]
+Reddy, et al.           Expires January 17, 2020               [Page 83]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4701,7 +4701,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 84]
+Reddy, et al.           Expires January 17, 2020               [Page 84]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4733,9 +4733,10 @@ Internet-Draft                    TURN                         July 2019
    mechanism.  Authors would like to thank Gonzalo Salgueiro, Simon
    Perreault, Jonathan Lennox, Brandon Williams, Karl Stahl, Noriyuki
    Torii, Nils Ohlmeier, Dan Wing, Vijay Gurbani, Joseph Touch, Justin
-   Uberti, Christopher Wood, Eric Vyncke, Adam Roach, Benjamin Kaduk and
-   Oleg Moskalenko for comments and review.  The authors would like to
-   thank Marc for his contributions to the text.
+   Uberti, Christopher Wood, Roman Danyliw, Eric Vyncke, Adam Roach,
+   Mirja Kuehlewind, Benjamin Kaduk, Noriyuki Torii and Oleg Moskalenko
+   for comments and review.  The authors would like to thank Marc for
+   his contributions to the text.
 
    Special thanks to Magnus Westerlund for the detailed AD review.
 
@@ -4756,8 +4757,7 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 85]
+Reddy, et al.           Expires January 17, 2020               [Page 85]
 
 Internet-Draft                    TURN                         July 2019
 
@@ -4806,22 +4806,17 @@ Internet-Draft                    TURN                         July 2019
               DOI 10.17487/RFC6437, November 2011,
               <https://www.rfc-editor.org/info/rfc6437>.
 
-   [RFC6724]  Thaler, D., Ed., Draves, R., Matsumoto, A., and T. Chown,
-              "Default Address Selection for Internet Protocol Version 6
-              (IPv6)", RFC 6724, DOI 10.17487/RFC6724, September 2012,
-              <https://www.rfc-editor.org/info/rfc6724>.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 86]
-
-Internet-Draft                    TURN                         July 2019
-
-
    [RFC7065]  Petit-Huguenin, M., Nandakumar, S., Salgueiro, G., and P.
               Jones, "Traversal Using Relays around NAT (TURN) Uniform
               Resource Identifiers", RFC 7065, DOI 10.17487/RFC7065,
               November 2013, <https://www.rfc-editor.org/info/rfc7065>.
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 86]
+
+Internet-Draft                    TURN                         July 2019
+
 
    [RFC7350]  Petit-Huguenin, M. and G. Salgueiro, "Datagram Transport
               Layer Security (DTLS) as Transport for Session Traversal
@@ -4863,18 +4858,21 @@ Internet-Draft                    TURN                         July 2019
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/info/rfc8446>.
 
+27.2.  Informative References
 
 
 
 
 
 
-Reddy, et al.           Expires January 11, 2020               [Page 87]
+
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 87]
 
 Internet-Draft                    TURN                         July 2019
 
-
-27.2.  Informative References
 
    [Frag-Harmful]
               Kent, C. and J. Mogul, ""Fragmentation Considered
@@ -4897,6 +4895,16 @@ Internet-Draft                    TURN                         July 2019
               (ICE)", draft-ietf-mmusic-ice-sip-sdp-36 (work in
               progress), June 2019.
 
+   [I-D.ietf-mptcp-rfc6824bis]
+              Ford, A., Raiciu, C., Handley, M., Bonaventure, O., and C.
+              Paasch, "TCP Extensions for Multipath Operation with
+              Multiple Addresses", draft-ietf-mptcp-rfc6824bis-18 (work
+              in progress), June 2019.
+
+   [I-D.ietf-rtcweb-security]
+              Rescorla, E., "Security Considerations for WebRTC", draft-
+              ietf-rtcweb-security-12 (work in progress), July 2019.
+
    [I-D.ietf-tram-stun-pmtud]
               Petit-Huguenin, M. and G. Salgueiro, "Path MTU Discovery
               Using Session Traversal Utilities for NAT (STUN)", draft-
@@ -4915,20 +4923,16 @@ Internet-Draft                    TURN                         July 2019
               DOI 10.17487/RFC0791, September 1981,
               <https://www.rfc-editor.org/info/rfc791>.
 
-   [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
-              DOI 10.17487/RFC1191, November 1990,
-              <https://www.rfc-editor.org/info/rfc1191>.
 
 
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 88]
+Reddy, et al.           Expires January 17, 2020               [Page 88]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
+              DOI 10.17487/RFC1191, November 1990,
+              <https://www.rfc-editor.org/info/rfc1191>.
 
    [RFC1918]  Rekhter, Y., Moskowitz, B., Karrenberg, D., de Groot, G.,
               and E. Lear, "Address Allocation for Private Internets",
@@ -4974,17 +4978,18 @@ Internet-Draft                    TURN                         July 2019
               RFC 4303, DOI 10.17487/RFC4303, December 2005,
               <https://www.rfc-editor.org/info/rfc4303>.
 
+
+
+
+Reddy, et al.           Expires January 17, 2020               [Page 89]
+
+Internet-Draft                    TURN                         July 2019
+
+
    [RFC4787]  Audet, F., Ed. and C. Jennings, "Network Address
               Translation (NAT) Behavioral Requirements for Unicast
               UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
               2007, <https://www.rfc-editor.org/info/rfc4787>.
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 89]
-
-Internet-Draft                    TURN                         July 2019
-
 
    [RFC4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
               Discovery", RFC 4821, DOI 10.17487/RFC4821, March 2007,
@@ -5029,18 +5034,19 @@ Internet-Draft                    TURN                         July 2019
               RFC 6156, DOI 10.17487/RFC6156, April 2011,
               <https://www.rfc-editor.org/info/rfc6156>.
 
-   [RFC6824]  Ford, A., Raiciu, C., Handley, M., and O. Bonaventure,
-              "TCP Extensions for Multipath Operation with Multiple
-              Addresses", RFC 6824, DOI 10.17487/RFC6824, January 2013,
-              <https://www.rfc-editor.org/info/rfc6824>.
 
 
 
-
-Reddy, et al.           Expires January 11, 2020               [Page 90]
+Reddy, et al.           Expires January 17, 2020               [Page 90]
 
 Internet-Draft                    TURN                         July 2019
 
+
+   [RFC6263]  Marjou, X. and A. Sollaud, "Application Mechanism for
+              Keeping Alive the NAT Mappings Associated with RTP / RTP
+              Control Protocol (RTCP) Flows", RFC 6263,
+              DOI 10.17487/RFC6263, June 2011,
+              <https://www.rfc-editor.org/info/rfc6263>.
 
    [RFC7413]  Cheng, Y., Chu, J., Radhakrishnan, S., and A. Jain, "TCP
               Fast Open", RFC 7413, DOI 10.17487/RFC7413, December 2014,
@@ -5084,19 +5090,15 @@ Internet-Draft                    TURN                         July 2019
               DOI 10.17487/RFC8445, July 2018,
               <https://www.rfc-editor.org/info/rfc8445>.
 
-Authors' Addresses
 
 
 
-
-
-
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 91]
+Reddy, et al.           Expires January 17, 2020               [Page 91]
 
 Internet-Draft                    TURN                         July 2019
 
+
+Authors' Addresses
 
    Tirumaleswar Reddy (editor)
    McAfee, Inc.
@@ -5147,6 +5149,4 @@ Internet-Draft                    TURN                         July 2019
 
 
 
-
-
-Reddy, et al.           Expires January 11, 2020               [Page 92]
+Reddy, et al.           Expires January 17, 2020               [Page 92]

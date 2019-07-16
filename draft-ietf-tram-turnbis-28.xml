@@ -92,7 +92,7 @@
       </address>
     </author>
 
-    <date day="10" month="July" year="2019" />
+    <date day="16" month="July" year="2019" />
 
     <area>Transport</area>
 
@@ -150,10 +150,15 @@
       <t>In many enterprise networks, direct UDP transmissions are not
       permitted between clients on the internal networks and external IP
       addresses. To permit media sessions in such a situation to use UDP and
-      to avoid forcing the media sessions through TCP, Enterprise Firewall can
-      be configured to allow UDP traffic relayed through an Enterprise relay
-      server. This scenario is required to be supported by the WebRTC
-      requirements (Section 2.3.5.1 in <xref target="RFC7478"></xref>).</t>
+      to avoid forcing the media sessions through TCP, an Enterprise Firewall
+      can be configured to allow UDP traffic relayed through an Enterprise
+      relay server. This scenario is required to be supported by the WebRTC
+      requirements (Section 2.3.5.1 in <xref target="RFC7478"></xref>). In
+      addition, in a SIP or WebRTC call, if the user wants IP location privacy
+      from the peer then the client can select a relay server offering IP
+      location privacy and only convey the relayed candidates to the peer for
+      ICE connectivity checks (see Section 4.2.4 in <xref
+      target="I-D.ietf-rtcweb-security"></xref>).</t>
 
       <t>This specification defines a protocol, called TURN, that allows a
       host behind a NAT (called the TURN client) to request that another host
@@ -425,7 +430,7 @@
       A's host transport address).</t>
 
       <t>Each allocation on the server belongs to a single client and has
-      exactly one relayed transport address that is used only by that
+      exactly one or two relayed transport addresses that is used only by that
       allocation. Thus, when a packet arrives at a relayed transport address
       on the server, the server knows for which client the data is
       intended.</t>
@@ -493,13 +498,13 @@
         between the TURN client and the TURN server, the cipher suites, server
         certificate validation and authentication of TURN server are discussed
         in Section 6.2.3 of <xref
-        target="I-D.ietf-tram-stunbis">&nbsp;</xref>&nbsp;and the guidance
-        given in <xref target="RFC7525"></xref> MUST be followed to avoid
-        attacks on (D)TLS. TURN does not require (D)TLS because the overhead
-        of using (D)TLS is higher than that of digest authentication; for
-        example, using (D)TLS likely means that most application data will be
-        doubly encrypted (once by (D)TLS and once to ensure it is still
-        encrypted in the UDP datagram).</t>
+        target="I-D.ietf-tram-stunbis">&nbsp;</xref>.&nbsp;The guidance given
+        in <xref target="RFC7525"></xref> MUST be followed to avoid attacks on
+        (D)TLS. TURN does not require (D)TLS because the overhead of using
+        (D)TLS is higher than that of digest authentication; for example,
+        using (D)TLS likely means that most application data will be doubly
+        encrypted (once by (D)TLS and once to ensure it is still encrypted in
+        the UDP datagram).</t>
 
         <t>There is an extension to TURN for TCP transport between the server
         and the peers <xref target="RFC6062"></xref>. For this reason,
@@ -859,15 +864,18 @@ client                               server          A             B
       <section title="Avoiding IP Fragmentation">
         <t>For reasons described in <xref target="Frag-Harmful"></xref>,
         applications, especially those sending large volumes of data, should
-        avoid having their packets fragmented. Applications using TCP can more
-        or less ignore this issue because fragmentation avoidance is now a
-        standard part of TCP, but applications using UDP (and thus any
-        application using this version of TURN) need to avoid IP fragmentation
-        by sending sufficiently small messages or use UDP fragmentation <xref
-        target="I-D.ietf-tsvwg-udp-options"></xref>. <xref
+        avoid having their packets fragmented. <xref
         target="I-D.ietf-intarea-frag-fragile"></xref> discusses issues
         associated with IP fragmentation and proposes alternatives to IP
-        fragmentation. </t>
+        fragmentation. Applications using TCP can more or less ignore this
+        issue because fragmentation avoidance is now a standard part of TCP,
+        but applications using UDP (and thus any application using this
+        version of TURN) need to avoid IP fragmentation by sending
+        sufficiently small messages or use UDP fragmentation <xref
+        target="I-D.ietf-tsvwg-udp-options"></xref>. Note that the UDP
+        fragmentation option needs to be supported by both endpoints, and at
+        the time of writing of this document, UDP fragmentation support is
+        under discussion and is not deployed.</t>
 
         <t>The application running on the client and the peer can take one of
         two approaches to avoid IP fragmentation until UDP fragmentation
@@ -936,9 +944,9 @@ client                               server          A             B
         attribute in the Allocate request -- any server that does not support
         the DONT-FRAGMENT attribute will indicate this by rejecting the
         Allocate request. If the TURN server carrying out packet translation
-        from IPv4-to-IPv6 cannot get the Don't Fragment (DF) bit in the IPv4
-        header, it MUST reject the Allocate request with DONT-FRAGMENT
-        attribute.</t>
+        from IPv4-to-IPv6 is unable to access the state of Don't Fragment (DF)
+        bit in the IPv4 header, it MUST reject the Allocate request with
+        DONT-FRAGMENT attribute.</t>
       </section>
 
       <section title="RTP Support">
@@ -1045,10 +1053,7 @@ client                               server          A             B
 
       <t><xref target="I-D.ietf-tram-stunbis"></xref> specifies an
       authentication mechanism called the long-term credential mechanism. TURN
-      servers and clients MUST implement this mechanism. The server SHOULD
-      demand that all requests from the client be authenticated using this
-      mechanism, or that a equally strong or stronger mechanism for client
-      authentication is used.</t>
+      servers and clients MUST implement this mechanism.</t>
 
       <t>Note that the long-term credential mechanism applies only to requests
       and cannot be used to authenticate indications; thus, indications in
@@ -1147,8 +1152,9 @@ client                               server          A             B
       amount of bandwidth those allocations can use. The server should reject
       new allocations that would exceed the limit on the allowed number of
       allocations active at one time with a 486 (Allocation Quota Exceeded)
-      (see <xref target="sec-rcv-allocate"></xref>), and should discard
-      application data traffic that exceeds the bandwidth quota.</t>
+      (see <xref target="sec-rcv-allocate"></xref>), and since UDP does not
+      include a congestion control mechanism, it should discard application
+      data traffic that exceeds the bandwidth quota.</t>
     </section>
 
     <section anchor="sec-allocations" title="Allocations">
@@ -1174,12 +1180,9 @@ client                               server          A             B
       the client, the 5-tuple uses the client's host transport address; on the
       server, the 5-tuple uses the client's server-reflexive transport
       address. The relayed transport address MUST be unique across all
-      allocations, so it can be used to uniquely identify the allocation.</t>
-
-      <t>Both the relayed transport address and the 5-tuple MUST be unique
-      across all allocations, so either one can be used to uniquely identify
-      the allocation, and an allocation in this context can be either a single
-      or dual allocation.</t>
+      allocations so it can be used to uniquely identify the allocation, and
+      an allocation in this context can be either a single or dual
+      allocation.</t>
 
       <t>The authentication information (e.g., username, password, realm, and
       nonce) is used to both verify subsequent requests and to compute the
@@ -1191,6 +1194,11 @@ client                               server          A             B
       and MUST store the key value, which is a cryptographic hash over the
       username, realm, and password (see Section 16.1.3 in <xref
       target="I-D.ietf-tram-stunbis"></xref>).</t>
+
+      <t>Note that if the response contains a PASSWORD-ALGORITHMS attribute
+      and this attribute contains both MD5 and SHA-256 algorithms, and the
+      client also supports both the algorithms, the request MUST contain a
+      PASSWORD-ALGORITHM attribute with the SHA-256 algorithm.</t>
 
       <t>The time-to-expiry is the time in seconds left until the allocation
       expires. Each Allocate or Refresh transaction sets this timer, which
@@ -1215,7 +1223,7 @@ client                               server          A             B
         <t>The client forms an Allocate request as follows.</t>
 
         <t>The client first picks a host transport address. It is RECOMMENDED
-        that the client pick a currently unused transport address, typically
+        that the client picks a currently unused transport address, typically
         by allowing the underlying OS to pick a currently unused port.</t>
 
         <t>The client then picks a transport protocol that the client supports
@@ -1304,15 +1312,17 @@ client                               server          A             B
       <section anchor="sec-rcv-allocate" title="Receiving an Allocate Request">
         <t>When the server receives an Allocate request, it performs the
         following checks:<list style="numbers">
-            <t>The server SHOULD require that the request be authenticated.
-            The authentication of the request is optional to allow TURN
-            servers provided by the local or access network to accept
-            Allocation requests from new and/or guest users in the network who
-            do not necessarily possess long term credentials for STUN
-            authentication and its security implications are discussed in
-            <xref target="RFC8155"></xref>. If the request is authenticated,
-            the authentication MUST be done using the long-term credential
-            mechanism of <xref target="I-D.ietf-tram-stunbis"></xref> unless
+            <t>The TURN server provided by the local or access network MAY
+            allow unauthenticated request in order to accept Allocation
+            requests from new and/or guest users in the network who do not
+            necessarily possess long term credentials for STUN authentication.
+            Making STUN authentication optional and its security implications
+            are discussed in <xref target="RFC8155"></xref>. Otherwise, the
+            server MUST require that the request be authenticated. If the
+            request is authenticated, the authentication MUST be done either
+            using the long-term credential mechanism of <xref
+            target="I-D.ietf-tram-stunbis"></xref> or the STUN Extension for
+            Third-Party Authorization <xref target="RFC7635"></xref> unless
             the client and server agree to use another mechanism through some
             procedure outside the scope of this document.</t>
 
@@ -1382,8 +1392,8 @@ client                               server          A             B
             error. If the server can partially meet the request, i.e. if it
             can only allocate one relayed transport address of a specific
             address type, then it includes ADDRESS-ERROR-CODE attribute in the
-            response to inform the client the reason for partial failure of
-            the request. The error code value signaled in the
+            success response to inform the client the reason for partial
+            failure of the request. The error code value signaled in the
             ADDRESS-ERROR-CODE attribute could be 440 (Address Family not
             Supported) or 508 (Insufficient Capacity). If the server can fully
             meet the request, then the server allocates one IPv4 and one IPv6
@@ -1487,7 +1497,8 @@ client                               server          A             B
         <t>Once the allocation is created, the server replies with a success
         response. The success response contains:<list style="symbols">
             <t>An XOR-RELAYED-ADDRESS attribute containing the relayed
-            transport address.</t>
+            transport address or two XOR-RELAYED-ADDRESS attributes containing
+            the relayed transport addresses.</t>
 
             <t>A LIFETIME attribute containing the current value of the
             time-to-expiry timer.</t>
@@ -1682,8 +1693,15 @@ client                               server          A             B
             attribute and try again immediately. Otherwise, the client SHOULD
             wait at least 1 minute before trying to create any more
             allocations on this server.</t>
-          </list>An unknown error response MUST be handled as described in
-        <xref target="I-D.ietf-tram-stunbis"></xref>.</t>
+          </list></t>
+
+        <t>Note that the error code values 486 and 508 indicate to a
+        eavesdropper that several other users are using the server at this
+        time, similar to that of the HTTP error response code 503, but does
+        not reveal any information about the users using the TURN server.</t>
+
+        <t>An unknown error response MUST be handled as described in <xref
+        target="I-D.ietf-tram-stunbis"></xref>.</t>
       </section>
     </section>
 
@@ -1709,13 +1727,13 @@ client                               server          A             B
         REQUESTED-ADDRESS-FAMILY attribute indicating the address family type
         that should be refreshed. If no REQUESTED-ADDRESS-FAMILY is included
         then the request should be treated as applying to all current
-        allocations. The client MUST only include family type it previously
-        allocated and has not yet deleted. This process can also be used to
-        delete an allocation of a specific address type, by setting the
-        lifetime of that refresh request to 0. Deleting a single allocation
-        destroys any permissions or channels associated with that particular
-        allocation; it MUST NOT affect any permissions or channels associated
-        with allocations for the other address family.</t>
+        allocations. The client MUST only include the family type it
+        previously allocated and has not yet deleted. This process can also be
+        used to delete an allocation of a specific address type, by setting
+        the lifetime of that refresh request to 0. Deleting a single
+        allocation destroys any permissions or channels associated with that
+        particular allocation; it MUST NOT affect any permissions or channels
+        associated with allocations for the other address family.</t>
 
         <t>The Refresh transaction updates the time-to-expiry timer of an
         allocation. If the client wishes the server to set the time-to-expiry
@@ -2053,8 +2071,8 @@ client                               server          A             B
         <xref target="RFC4443"></xref> packet. It also verifies that the IP
         packet in the ICMP packet payload contains a UDP header, and if a UDP
         header is present, the server extracts the UDP source and destination
-        port information. If either of these conditions fail, then the ICMP
-        packet is silently dropped.</t>
+        IP address and port information. If either of these conditions fail,
+        then the ICMP packet is silently dropped.</t>
 
         <t>The server looks up the allocation whose relayed transport address
         corresponds to the encapsulated packet's source IP address and UDP
@@ -2083,6 +2101,13 @@ client                               server          A             B
         attribute is set to the destination port otherwise the port portion is
         set to 0. The Data indication is then sent on the 5-tuple associated
         with the allocation.</t>
+
+        <t>Implementation Note: New ICMP types or codes can be defined in
+        future specifications. If the server receives an ICMP error packet,
+        and the new type or code field can help the client to make use of the
+        ICMP error notification and generate feedback to the application
+        layer, the server sends the Data indication with an ICMP attribute
+        conveying the new ICMP type or code.</t>
       </section>
 
       <section anchor="receive-senderror"
@@ -2252,16 +2277,14 @@ client                               server          A             B
 
             <t>The transport address is not currently bound to a different
             channel number.</t>
-
-            <t>If the XOR-PEER-ADDRESS attribute contains an address of an
-            address family that is not the same as that of a relayed transport
-            address for the allocation, the server MUST generate an error
-            response with the 443 (Peer Address Family Mismatch) response
-            code.</t>
           </list></t>
 
         <t>If any of these tests fail, the server replies with a 400 (Bad
-        Request) error.</t>
+        Request) error. If the XOR-PEER-ADDRESS attribute contains an address
+        of an address family that is not the same as that of a relayed
+        transport address for the allocation, the server MUST generate an
+        error response with the 443 (Peer Address Family Mismatch) response
+        code.</t>
 
         <t>The server MAY impose restrictions on the IP address and port
         values allowed in the XOR-PEER-ADDRESS attribute -- if a value is not
@@ -2409,7 +2432,7 @@ client                               server          A             B
           </list>The resulting UDP datagram is then sent to the peer. Note
         that if the Length field in the ChannelData message is 0, then there
         will be no data in the UDP datagram, but the UDP datagram is still
-        formed and sent.</t>
+        formed and sent (Section 4.1 in <xref target="RFC6263"></xref>).</t>
       </section>
 
       <section anchor="sec-channel-relaying"
@@ -2423,8 +2446,8 @@ client                               server          A             B
         described in <xref target="sec-sending-channeldata-msg"></xref>.</t>
 
         <t>When the server receives an ICMP packet, the server processes it as
-        described in <xref target="sec-sending-senderror-indication"></xref>.
-        </t>
+        described in <xref
+        target="sec-sending-senderror-indication"></xref>.</t>
       </section>
     </section>
 
@@ -2441,10 +2464,10 @@ client                               server          A             B
       the following sections follow this principle.</t>
 
       <t>The descriptions below have two parts: a preferred behavior and an
-      alternate behavior. The server SHOULD implement the preferred behavior.
-      Otherwise, if that is not possible for a particular field, the server
-      MUST implement the alternate behavior and MUST NOT do anything else for
-      the reasons detailed in <xref target="RFC7915"></xref>. The TURN server
+      alternate behavior. The server SHOULD implement the preferred behavior,
+      but if that is not possible for a particular field, the server MUST
+      implement the alternate behavior and MUST NOT do anything else for the
+      reasons detailed in <xref target="RFC7915"></xref>. The TURN server
       solely relies on the DF bit in the IPv4 header and Fragmentation header
       in IPv6 header to handle fragmentation and does not rely on the
       DONT-FRAGMENT attribute.</t>
@@ -2726,24 +2749,24 @@ client                               server          A             B
       to the peer. Note that the server does not perform per-packet
       translation for TCP-to-UDP relaying.</t>
 
-      <t>TCP multi-path <xref target="RFC6824"></xref> is not supported by
-      this version of TURN because TCP multi-path is not used by both SIP and
-      WebRTC protocols <xref target="RFC7478"></xref> for media and non-media
-      data. TCP connection between the TURN client and server can use TCP-AO
-      <xref target="RFC5925"></xref> but UDP does not provide a similar type
-      of authentication until UDP supports a similar authentication option
-      <xref target="I-D.ietf-tsvwg-udp-options"></xref>. Even if both TCP-AO
-      and UDP authentication would be used between TURN client and server, it
-      would not change the end-to-end security properties of the application
-      payload being relayed. Therefore applications using TURN will need to
-      secure their application data end-to-end appropriately, e.g., SRTP for
-      RTP applications. Note that TCP-AO option obsoletes TCP MD5 option.
-      Unlike UDP, TCP without the TCP Fast Open extension <xref
-      target="RFC7413"></xref> does not support 0-RTT session resumption. The
-      TCP user timeout <xref target="RFC5482"></xref> equivalent for
-      application data relayed by the TURN is the use of RTP control protocol
-      (RTCP). As a reminder, RTCP is a fundamental and integral part of
-      RTP.</t>
+      <t>Multipath TCP <xref target="I-D.ietf-mptcp-rfc6824bis"></xref> is not
+      supported by this version of TURN because TCP multi-path is not used by
+      both SIP and WebRTC protocols <xref target="RFC7478"></xref> for media
+      and non-media data. TCP connection between the TURN client and server
+      can use TCP-AO <xref target="RFC5925"></xref> but UDP does not provide a
+      similar type of authentication until UDP supports a similar
+      authentication option <xref target="I-D.ietf-tsvwg-udp-options"></xref>.
+      Even if both TCP-AO and UDP authentication would be used between TURN
+      client and server, it would not change the end-to-end security
+      properties of the application payload being relayed. Therefore
+      applications using TURN will need to secure their application data
+      end-to-end appropriately, e.g., SRTP for RTP applications. Note that
+      TCP-AO option obsoletes TCP MD5 option. Unlike UDP, TCP without the TCP
+      Fast Open extension <xref target="RFC7413"></xref> does not support
+      0-RTT session resumption. The TCP user timeout <xref
+      target="RFC5482"></xref> equivalent for application data relayed by the
+      TURN is the use of RTP control protocol (RTCP). As a reminder, RTCP is a
+      fundamental and integral part of RTP.</t>
 
       <t>The descriptions below have two parts: a preferred behavior and an
       alternate behavior. The server SHOULD implement the preferred behavior,
@@ -2858,8 +2881,8 @@ client                               server          A             B
           ICMP messages resulting from the UDP datagrams sent to the peer are
           processed by the server as described in <xref
           target="sec-sending-senderror-indication"></xref> and forwarded to
-          the client using TURN's mechanism for relevant ICMP types and codes.
-          </t>
+          the client using TURN's mechanism for relevant ICMP types and
+          codes.</t>
 
           <t>Alternate Behavior: Same as preferred.</t>
         </list></t>
@@ -2970,15 +2993,16 @@ client                               server          A             B
       </section>
 
       <section title="DATA">
-        <t>The DATA attribute is present in all Send and Data indications. The
-        value portion of this attribute is variable length and consists of the
-        application data (that is, the data that would immediately follow the
-        UDP header if the data was been sent directly between the client and
-        the peer). The application data is equivalent to the "UDP user data"
-        and does not include the "surplus area" defined in Section 4 of <xref
-        target="I-D.ietf-tsvwg-udp-options"></xref>. If the length of this
-        attribute is not a multiple of 4, then padding must be added after
-        this attribute.</t>
+        <t>The DATA attribute is present in all Send indications. If the ICMP
+        attribute is not present in a Data indication, it contains a DATA
+        attribute. The value portion of this attribute is variable length and
+        consists of the application data (that is, the data that would
+        immediately follow the UDP header if the data was been sent directly
+        between the client and the peer). The application data is equivalent
+        to the "UDP user data" and does not include the "surplus area" defined
+        in Section 4 of <xref target="I-D.ietf-tsvwg-udp-options"></xref>. If
+        the length of this attribute is not a multiple of 4, then padding must
+        be added after this attribute.</t>
       </section>
 
       <section title="XOR-RELAYED-ADDRESS">
@@ -3042,8 +3066,8 @@ client                               server          A             B
             allocation. If 0, no such reservation is requested.</t>
 
             <t hangText="RFFU:">Reserved For Future Use.</t>
-          </list>The other 7 bits of the attribute's value must be set to zero
-        on transmission and ignored on reception.</t>
+          </list>The RFFU field must be set to zero on transmission and
+        ignored on reception. </t>
 
         <t>Since the length of this attribute is not a multiple of 4, padding
         must immediately follow this attribute.</t>
@@ -3103,8 +3127,7 @@ client                               server          A             B
         value in Allocate request.</t>
       </section>
 
-      <section anchor="sec-address-error-code"
-               title="ADDRESS-ERROR-CODE Attribute">
+      <section anchor="sec-address-error-code" title="ADDRESS-ERROR-CODE ">
         <t>This attribute is used by servers to signal the reason for not
         allocating the requested address family. The value portion of this
         attribute is variable length with the following format:</t>
@@ -3128,8 +3151,8 @@ client                               server          A             B
             addresses.</t>
 
             <t hangText="Reserved:">at this point, the 13 bits in the Reserved
-            field MUST be set to zero by the client and MUST be ignored by the
-            server.</t>
+            field MUST be set to zero by the server and MUST be ignored by the
+            client.</t>
 
             <t hangText="Class:">The Class represents the hundreds digit of
             the error code and is defined in section 14.8 of <xref
@@ -3150,7 +3173,7 @@ client                               server          A             B
           </list></t>
       </section>
 
-      <section anchor="icmp" title="ICMP Attribute">
+      <section anchor="icmp" title="ICMP ">
         <t>This attribute is used by servers to signal the reason an UDP
         packet was dropped. The following is the format of the ICMP
         attribute.</t>
@@ -3242,7 +3265,7 @@ client                               server          A             B
       attribute is included with an address of 192.0.2.15 and a port of 9000,
       here the address and port are shown before the xor-ing is done. For
       attributes with string-like values (e.g., SOFTWARE="Example client,
-      version 1.03" and NONCE="obMatJos2AAABadl7W7PeDU4hKE72jda"), the value
+      version 1.03" and NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"), the value
       of the attribute is shown in quotes for readability, but these quotes do
       not appear in the actual value.</t>
 
@@ -3287,7 +3310,7 @@ client                               server          A             B
   |    LIFETIME=1200 (20 minutes)      |             |             |
   |    XOR-RELAYED-ADDRESS=192.0.2.15:50000          |             |
   |    XOR-MAPPED-ADDRESS=192.0.2.1:7000             |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 ]]></artwork>
 
         <postamble></postamble>
@@ -3347,16 +3370,14 @@ client                               server          A             B
       use the username "George" for the realm "example.com". The client
       includes the PASSWORD-ALGORITHM attribute indicating the algorithm that
       the server must use to derive the long- term password. The client also
-      includes the REALM and NONCE attributes, which are just copied from the
-      401 error response. Finally, the client includes MESSAGE-INTEGRITY and
-      MESSAGE-INTEGRITY-SHA256 attributes as the last attributes in the
-      message, whose values are Hashed Message Authentication Code - Secure
-      Hash Algorithm 1 (HMAC-SHA1) hash and Hashed Message Authentication Code
-      - Secure Hash Algorithm 2 (HMAC-SHA2) hash over the contents of the
-      message (shown as just "..." above); this HMAC-SHA1 and HMAC-SHA2
-      computation includes a password value. Thus, an attacker cannot compute
-      the message integrity value without somehow knowing the secret
-      password.</t>
+      includes the REALM, PASSWORD-ALGORITHMS and NONCE attributes, which are
+      just copied from the 401 error response. Finally, the client includes
+      MESSAGE-INTEGRITY-SHA256 attribute as the last attributes in the
+      message, whose value is Hashed Message Authentication Code - Secure Hash
+      Algorithm 2 (HMAC-SHA2) hash over the contents of the message (shown as
+      just "..." above); this HMAC-SHA2 computation includes a password value.
+      Thus, an attacker cannot compute the message integrity value without
+      somehow knowing the secret password.</t>
 
       <t>The server, upon receipt of the authenticated Allocate request,
       checks that everything is OK, then creates an allocation. The server
@@ -3369,10 +3390,10 @@ client                               server          A             B
       server includes an XOR-MAPPED-ADDRESS attribute whose value is the
       server-reflexive address of the client; this value is not used otherwise
       in TURN but is returned as a convenience to the client. The server
-      includes either a MESSAGE-INTEGRITY or MESSAGE-INTEGRITY-SHA256
-      attribute to authenticate the response and to ensure its integrity; note
-      that the response does not contain the USERNAME, REALM, and NONCE
-      attributes. The server also includes a SOFTWARE attribute.</t>
+      includes a MESSAGE-INTEGRITY-SHA256 attribute to authenticate the
+      response and to ensure its integrity; note that the response does not
+      contain the USERNAME, REALM, and NONCE attributes. The server also
+      includes a SOFTWARE attribute.</t>
 
       <t></t>
 
@@ -3385,11 +3406,13 @@ client                               server          A             B
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
   |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+  |    PASSWORD-ALGORITHM=SHA256       |             |             |  
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
   |                                    |             |             |
   |<-- CreatePermission success resp.--|             |             |
   |    Transaction-Id=0xE5913A8F460956CA277D3319     |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 ]]></artwork>
 
         <postamble></postamble>
@@ -3411,9 +3434,9 @@ client                               server          A             B
       corresponding permission, and then replies with a CreatePermission
       success response. Like the client, the server chooses not to include the
       SOFTWARE attribute in its reply. Again, note how success responses
-      contain a MESSAGE-INTEGRITY or MESSAGE-INTEGRITY-SHA256 attribute
-      (assuming the server uses the long-term credential mechanism), but no
-      USERNAME, REALM, and NONCE attributes.</t>
+      contains a MESSAGE-INTEGRITY-SHA256 attribute (assuming the server uses
+      the long-term credential mechanism), but no USERNAME, REALM, and NONCE
+      attributes.</t>
 
       <t></t>
 
@@ -3479,11 +3502,13 @@ client                               server          A             B
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
   |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+  |    PASSWORD-ALGORITHM=SHA256       |             |             |  
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
   |                                    |             |             |
   |<-- ChannelBind success response ---|             |             |
   |    Transaction-Id=0x6490D3BC175AFF3D84513212     |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 ]]></artwork>
 
         <postamble></postamble>
@@ -3548,11 +3573,13 @@ client                               server          A             B
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
   |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+  |    PASSWORD-ALGORITHM=SHA256       |             |             |  
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
   |                                    |             |             |
   |<-- ChannelBind success response ---|             |             |
   |    Transaction-Id=0xE5913A8F46091637EF7D3328     |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
 ]]></artwork>
 
           <postamble></postamble>
@@ -3573,7 +3600,9 @@ client                               server          A             B
   |    USERNAME="George"               |             |             |
   |    REALM="example.com"             |             |             |
   |    NONCE="oobMatJos2gAAAadl7W7PeDU4hKE72jda"     |             |
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
+  |    PASSWORD-ALGORITHM=SHA256       |             |             |  
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
   |                                    |             |             |
   |<-- Refresh error response ---------|             |             |
   |    Transaction-Id=0x0864B3C27ADE9354B4312414     |             |
@@ -3591,7 +3620,7 @@ client                               server          A             B
   |    NONCE="obMatJos2gAAAadl7W7PeDU4hKE72jda"      |             |
   |    PASSWORD-ALGORITHMS=MD5 and SHA256            |             |
   |    PASSWORD-ALGORITHM=SHA256       |             |             | 
-  |    MESSAGE-INTEGRITY=...           |             |             |
+  |    MESSAGE-INTEGRITY-SHA256=...    |             |             |
   |                                    |             |             |
   |<-- Refresh success response -------|             |             |
   |    Transaction-Id=0x427BD3E625A85FC731DC4191     |             |
@@ -3689,8 +3718,8 @@ client                               server          A             B
           generally present in IP-based communications and is not
           substantially worsened by TURN. Consider a normal, non-TURN IP
           session between hosts A and B. An attacker can send packets to B as
-          if they came from A by sending packets towards A with a spoofed IP
-          address of B. This attack requires the attacker to know the IP
+          if they came from A by sending packets towards B with a spoofed IP
+          address of A. This attack requires the attacker to know the IP
           addresses of A and B. With TURN, an attacker wishing to send packets
           towards a client using a Data indication needs to know its IP
           address (and port), the IP address and port of the TURN server, and
@@ -3750,20 +3779,24 @@ client                               server          A             B
           user's identity, the USERNAME attribute carries an ephemeral and
           unique key identifier. If the TURN client and server use the STUN
           long-term credential mechanism and the username reveals the real
-          user's identity, the client needs to use (D)TLS transport between
-          the client and the server or use the USERHASH attribute instead of
-          the USERNAME attribute to anonynmize the username.</t>
+          user's identity, the client MUST either use the USERHASH attribute
+          instead of the USERNAME attribute to anonynmize the username or use
+          (D)TLS transport between the client and the server.</t>
 
           <t>If the TURN client and server use the STUN long-term credential
           mechanism and realm information is privacy sensitive, TURN can be
           run over (D)TLS. As a reminder, STUN Extension for Third-Party
           Authorization does not use realm.</t>
 
-          <t>SOFTWARE attribute can reveal the specific software version of
-          the TURN client and server to eavesdropper and it might possibly
+          <t>The SOFTWARE attribute can reveal the specific software version
+          of the TURN client and server to eavesdropper and it might possibly
           allow attacks against vulnerable software that is known to contain
-          security holes. If it is important to prevent an eavesdropper from
-          learning the software version, TURN can be run over (D)TLS.</t>
+          security vulnerabilities. If the software version is known to
+          contain security vulnerabilities, TURN SHOULD be run over (D)TLS to
+          prevent leaking the SOFTWARE attribute in clear text. If zero-day
+          vulnerabilities are detected in the software version, the endpoint
+          policy can be modified to mandate the use of (D)TLS till the patch
+          is in place to fix the flaw.</t>
 
           <t>TURN concerns itself primarily with authentication and message
           integrity. Confidentiality is only a secondary concern, as TURN
@@ -4182,9 +4215,10 @@ client                               server          A             B
       mechanism. Authors would like to thank Gonzalo Salgueiro, Simon
       Perreault, Jonathan Lennox, Brandon Williams, Karl Stahl, Noriyuki
       Torii, Nils Ohlmeier, Dan Wing, Vijay Gurbani, Joseph Touch, Justin
-      Uberti, Christopher Wood, &Eacute;ric Vyncke, Adam Roach, Benjamin Kaduk
-      and Oleg Moskalenko for comments and review. The authors would like to
-      thank Marc for his contributions to the text.</t>
+      Uberti, Christopher Wood, Roman Danyliw, &Eacute;ric Vyncke, Adam Roach,
+      Mirja K&uuml;hlewind, Benjamin Kaduk, Noriyuki Torii and Oleg Moskalenko
+      for comments and review. The authors would like to thank Marc for his
+      contributions to the text.</t>
 
       <t>Special thanks to Magnus Westerlund for the detailed AD review.</t>
     </section>
@@ -4213,8 +4247,6 @@ client                               server          A             B
       <?rfc include='reference.RFC.4443'?>
 
       <?rfc include="reference.I-D.ietf-tram-stunbis"?>
-
-      <?rfc include='reference.RFC.6724'?>
 
       <?rfc include='reference.RFC.8305'?>
 
@@ -4289,6 +4321,8 @@ client                               server          A             B
 
       <?rfc include='reference.I-D.ietf-intarea-frag-fragile'?>
 
+      <?rfc include='reference.I-D.ietf-rtcweb-security'?>
+
       <?rfc include="reference.RFC.8155"?>
 
       <?rfc include='reference.RFC.4086'?>
@@ -4305,7 +4339,7 @@ client                               server          A             B
 
       <?rfc include='reference.RFC.7657'?>
 
-      <?rfc include='reference.RFC.6824'?>
+      <?rfc include='reference.I-D.ietf-mptcp-rfc6824bis'?>
 
       <?rfc include='reference.RFC.7478'?>
 
@@ -4314,6 +4348,8 @@ client                               server          A             B
       <?rfc include='reference.RFC.7413'?>
 
       <?rfc include='reference.RFC.5482'?>
+
+      <?rfc include='reference.RFC.6263'?>
 
       <reference anchor="Port-Numbers"
                  target="http://www.iana.org/assignments/port-numbers">
