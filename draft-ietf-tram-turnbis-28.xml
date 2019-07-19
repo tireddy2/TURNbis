@@ -1053,7 +1053,9 @@ client                               server          A             B
 
       <t><xref target="I-D.ietf-tram-stunbis"></xref> specifies an
       authentication mechanism called the long-term credential mechanism. TURN
-      servers and clients MUST implement this mechanism.</t>
+      servers and clients MUST implement this mechanism, and the
+      authentication options are discussed in <xref
+      target="sec-rcv-allocate"></xref>.</t>
 
       <t>Note that the long-term credential mechanism applies only to requests
       and cannot be used to authenticate indications; thus, indications in
@@ -1107,11 +1109,12 @@ client                               server          A             B
 
       <t>TURN, as defined in this specification, supports both IPv4 and IPv6.
       IPv6 support in TURN includes IPv4-to-IPv6, IPv6-to-IPv6, and
-      IPv6-to-IPv4 relaying. The REQUESTED-ADDRESS-FAMILY attribute allows a
-      client to explicitly request the address type the TURN server will
-      allocate (e.g., an IPv4-only node may request the TURN server to
-      allocate an IPv6 address). The ADDITIONAL-ADDRESS-FAMILY attribute
-      allows a client to request the server to allocate one IPv4 and one IPv6
+      IPv6-to-IPv4 relaying. When only a single address type is desired, the
+      REQUESTED-ADDRESS-FAMILY attribute is used to explicitly request the
+      address type the TURN server will allocate (e.g., an IPv4-only node may
+      request the TURN server to allocate an IPv6 address). If both IPv4 and
+      IPv6 are desired, the single ADDITIONAL-ADDRESS-FAMILY attribute
+      indicates a request to the server to allocate one IPv4 and one IPv6
       relay address in a single Allocate request. This saves local ports on
       the client and reduces the number of messages sent between the client
       and the TURN server.</t>
@@ -3067,7 +3070,7 @@ client                               server          A             B
 
             <t hangText="RFFU:">Reserved For Future Use.</t>
           </list>The RFFU field must be set to zero on transmission and
-        ignored on reception. </t>
+        ignored on reception.</t>
 
         <t>Since the length of this attribute is not a multiple of 4, padding
         must immediately follow this attribute.</t>
@@ -4216,9 +4219,9 @@ client                               server          A             B
       Perreault, Jonathan Lennox, Brandon Williams, Karl Stahl, Noriyuki
       Torii, Nils Ohlmeier, Dan Wing, Vijay Gurbani, Joseph Touch, Justin
       Uberti, Christopher Wood, Roman Danyliw, &Eacute;ric Vyncke, Adam Roach,
-      Mirja K&uuml;hlewind, Benjamin Kaduk, Noriyuki Torii and Oleg Moskalenko
-      for comments and review. The authors would like to thank Marc for his
-      contributions to the text.</t>
+      Mirja K&uuml;hlewind, Benjamin Kaduk and Oleg Moskalenko for comments
+      and review. The authors would like to thank Marc for his contributions
+      to the text.</t>
 
       <t>Special thanks to Magnus Westerlund for the detailed AD review.</t>
     </section>
